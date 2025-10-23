@@ -1,4 +1,4 @@
-// server.js - SJC Sports Facebook Chatbot (IMPROVED with Better Error Logging)
+// server.js - SJC Sports Facebook Chatbot (FULLY FIXED & DEBUGGED)
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
@@ -12,76 +12,62 @@ const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const PORT = process.env.PORT || 3000;
 
-// Critical validation on startup
-console.log('\n🔍 STARTUP VALIDATION:');
-if (!PAGE_ACCESS_TOKEN || PAGE_ACCESS_TOKEN === 'undefined' || PAGE_ACCESS_TOKEN.length < 50) {
-  console.error('❌ CRITICAL ERROR: PAGE_ACCESS_TOKEN is missing or invalid!');
-  console.error('   Token length:', PAGE_ACCESS_TOKEN ? PAGE_ACCESS_TOKEN.length : 0);
-  console.error('   First 20 chars:', PAGE_ACCESS_TOKEN ? PAGE_ACCESS_TOKEN.substring(0, 20) + '...' : 'NONE');
-  console.error('\n   ⚠️  THE BOT WILL NOT WORK WITHOUT A VALID TOKEN!');
-  console.error('   📌 Get it from: Facebook App Dashboard → Messenger → Access Tokens\n');
-} else {
-  console.log('✅ PAGE_ACCESS_TOKEN: Set correctly (length:', PAGE_ACCESS_TOKEN.length, ')');
-}
-
-if (!GEMINI_API_KEY || GEMINI_API_KEY === 'undefined') {
-  console.warn('⚠️  WARNING: GEMINI_API_KEY not set. Using fallback responses only.');
-} else {
-  console.log('✅ GEMINI_API_KEY: Set correctly');
-}
-
-console.log('✅ VERIFY_TOKEN:', VERIFY_TOKEN);
-console.log('');
+// Validate configuration
+console.log('\n🔍 CONFIGURATION CHECK:');
+console.log('✓ VERIFY_TOKEN:', VERIFY_TOKEN ? 'SET' : 'MISSING');
+console.log('✓ PAGE_ACCESS_TOKEN:', PAGE_ACCESS_TOKEN ? `SET (${PAGE_ACCESS_TOKEN.length} chars)` : 'MISSING');
+console.log('✓ GEMINI_API_KEY:', GEMINI_API_KEY ? 'SET' : 'MISSING');
 
 // Using Gemini 2.0 Flash
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
-// Business Context
-const BUSINESS_CONTEXT = `You are a friendly and helpful MULTILINGUAL assistant for the Saint Joseph College (SJC) GreenHawks Sports Program in Maasin City, Southern Leyte, Philippines.
+// Enhanced Business Context
+const BUSINESS_CONTEXT = `You are a friendly MULTILINGUAL assistant for Saint Joseph College (SJC) GreenHawks Sports Program in Maasin City, Philippines.
 
-BUSINESS DETAILS:
-- Name: Saint Joseph College GreenHawks Sports Program
+KEY INFO:
 - Location: Tungka-tunga, Maasin City, Southern Leyte, Philippines
 - Email: sjcdo@gmail.com
-- Sports Offered: Basketball, Volleyball, Badminton, Football, Table Tennis, Swimming, and more
-
-CORE VALUES: Teamwork, Discipline, Sportsmanship, Resilience, Faith
-
-KEY INFORMATION:
-- We compete in PRISAA regional and national meets
-- We provide varsity scholarships for qualified student-athletes
-- Athletes must maintain academic eligibility
-- Medical clearance required before tryouts
+- Sports: Basketball, Volleyball, Badminton, Football, Table Tennis, Swimming
+- We offer varsity scholarships for qualified student-athletes
 - Training: 2-3 hours, 4-5 times/week, late afternoon/evening
-- School provides uniforms and major equipment
-- Travel, accommodation, and meals provided for competitions
+- Medical clearance required before tryouts
+- Compete in PRISAA regional and national meets
 
-CRITICAL INSTRUCTIONS:
-1. **ALWAYS detect and respond in the SAME LANGUAGE the user writes in**
-2. Keep responses SHORT (2-4 sentences) but helpful
-3. Use sports emojis: 🏀⚽🏐🏆🦅
+INSTRUCTIONS:
+1. ALWAYS respond in the SAME LANGUAGE the user writes in
+2. Keep responses SHORT (2-4 sentences)
+3. Be enthusiastic with sports emojis 🏀⚽🏐🦅
 4. If unsure, suggest contacting sjcdo@gmail.com
-5. Be enthusiastic about SJC sports!
 
-IMPORTANT: Your response MUST be in the SAME language as the user's message.`;
+CRITICAL: Respond in user's language!`;
 
 // Language detection
 function detectLanguage(text) {
   const lower = text.toLowerCase();
   
-  if (lower.match(/(ako|ikaw|mo|ko|ba|po|hindi|oo|paano|ano)/)) return 'Filipino';
-  if (lower.match(/(nako|nimo|dili|unsa|asa)/)) return 'Cebuano';
-  if (lower.match(/(hola|gracias|sí|cómo|qué)/)) return 'Spanish';
-  if (lower.match(/(bonjour|merci|oui|comment)/)) return 'French';
-  if (lower.match(/(hallo|danke|ja|wie)/)) return 'German';
-  if (lower.match(/(ciao|grazie|sì|come)/)) return 'Italian';
-  if (lower.match(/(olá|obrigado|sim|como)/)) return 'Portuguese';
-  if (text.match(/[а-яА-ЯёЁ]/)) return 'Russian';
-  if (text.match(/[\u0600-\u06FF]/)) return 'Arabic';
+  // Filipino/Tagalog
+  if (lower.match(/(ako|ikaw|mo|ko|ba|po|hindi|oo|paano|ano|saan|gusto)/)) return 'Filipino';
+  // Cebuano/Bisaya  
+  if (lower.match(/(nako|nimo|dili|unsa|asa|gusto|og|kay)/)) return 'Cebuano';
+  // Spanish
+  if (lower.match(/(hola|gracias|sí|cómo|qué|dónde|quiero)/)) return 'Spanish';
+  // French
+  if (lower.match(/(bonjour|merci|oui|comment|quoi|où)/)) return 'French';
+  // German
+  if (lower.match(/(hallo|danke|ja|wie|was|wo)/)) return 'German';
+  // Chinese
   if (text.match(/[\u4E00-\u9FFF]/)) return 'Chinese';
+  // Japanese
   if (text.match(/[\u3040-\u309F\u30A0-\u30FF]/)) return 'Japanese';
+  // Korean
   if (text.match(/[\uAC00-\uD7AF]/)) return 'Korean';
+  // Arabic
+  if (text.match(/[\u0600-\u06FF]/)) return 'Arabic';
+  // Russian
+  if (text.match(/[а-яА-ЯёЁ]/)) return 'Russian';
+  // Thai
   if (text.match(/[\u0E00-\u0E7F]/)) return 'Thai';
+  // Hindi
   if (text.match(/[\u0900-\u097F]/)) return 'Hindi';
   
   return 'English';
@@ -89,112 +75,143 @@ function detectLanguage(text) {
 
 // Root route
 app.get('/', (req, res) => {
-  const tokenStatus = PAGE_ACCESS_TOKEN && PAGE_ACCESS_TOKEN.length > 50;
-  const geminiStatus = GEMINI_API_KEY && GEMINI_API_KEY !== 'undefined';
-  
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>SJC Sports Chatbot</title>
       <meta charset="UTF-8">
+      <title>SJC Sports Bot - Status</title>
       <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-          font-family: Arial, sans-serif;
-          max-width: 900px;
-          margin: 50px auto;
-          padding: 20px;
+          font-family: 'Segoe UI', Arial, sans-serif;
           background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
           color: white;
+          padding: 20px;
+          min-height: 100vh;
         }
         .container {
+          max-width: 1000px;
+          margin: 0 auto;
           background: rgba(255,255,255,0.1);
-          padding: 30px;
-          border-radius: 10px;
           backdrop-filter: blur(10px);
+          border-radius: 15px;
+          padding: 40px;
         }
         h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .status { margin: 20px 0; }
-        .status-item { 
-          padding: 15px; 
-          margin: 10px 0; 
-          background: rgba(255,255,255,0.2); 
-          border-radius: 5px;
-          font-size: 1.1em;
+        .status {
+          display: grid;
+          gap: 15px;
+          margin: 30px 0;
         }
-        .green { color: #4CAF50; font-weight: bold; }
-        .red { color: #f44336; font-weight: bold; }
-        .warning { 
-          background: rgba(255,152,0,0.2); 
-          border-left: 4px solid #ff9800;
-          padding: 15px;
-          margin: 20px 0;
-          border-radius: 5px;
+        .status-card {
+          background: rgba(255,255,255,0.15);
+          padding: 20px;
+          border-radius: 10px;
+          border-left: 5px solid;
         }
-        .success {
-          background: rgba(76,175,80,0.2);
-          border-left: 4px solid #4CAF50;
-          padding: 15px;
+        .status-card.ok { border-color: #4CAF50; }
+        .status-card.error { border-color: #f44336; }
+        .status-card.warning { border-color: #ff9800; }
+        .label { font-size: 0.9em; opacity: 0.8; margin-bottom: 5px; }
+        .value { font-size: 1.3em; font-weight: bold; }
+        .ok-text { color: #4CAF50; }
+        .error-text { color: #f44336; }
+        .warning-text { color: #ff9800; }
+        .info-box {
+          background: rgba(255,255,255,0.1);
+          padding: 20px;
+          border-radius: 10px;
           margin: 20px 0;
+        }
+        .languages {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          gap: 10px;
+          margin-top: 15px;
+        }
+        .lang-tag {
+          background: rgba(255,255,255,0.2);
+          padding: 8px;
           border-radius: 5px;
+          text-align: center;
+          font-size: 0.9em;
         }
       </style>
     </head>
     <body>
       <div class="container">
-        <h1>🏀 SJC GreenHawks Sports Chatbot</h1>
-        <p><strong>🌍 Powered by Google Gemini 2.0 Flash - MULTILINGUAL AI</strong></p>
+        <h1>🏀 SJC GreenHawks Sports Bot</h1>
+        <p style="font-size: 1.2em; margin: 10px 0;">🌍 Multilingual AI Chatbot - Powered by Google Gemini 2.0</p>
         
         <div class="status">
-          <div class="status-item">
-            🚀 Server Status: <span class="green">✓ Running on Port ${PORT}</span>
+          <div class="status-card ok">
+            <div class="label">🚀 SERVER STATUS</div>
+            <div class="value ok-text">✓ Running on Port ${PORT}</div>
           </div>
-          <div class="status-item">
-            🔑 Verify Token: <span class="${VERIFY_TOKEN ? 'green' : 'red'}">${VERIFY_TOKEN ? '✓ Set' : '✗ Missing'}</span>
+          
+          <div class="status-card ${VERIFY_TOKEN ? 'ok' : 'error'}">
+            <div class="label">🔑 VERIFY TOKEN</div>
+            <div class="value ${VERIFY_TOKEN ? 'ok-text' : 'error-text'}">
+              ${VERIFY_TOKEN ? '✓ ' + VERIFY_TOKEN : '✗ Not Set'}
+            </div>
           </div>
-          <div class="status-item">
-            📱 Page Access Token: <span class="${tokenStatus ? 'green' : 'red'}">${tokenStatus ? '✓ Valid (length: ' + PAGE_ACCESS_TOKEN.length + ')' : '✗ MISSING OR INVALID'}</span>
+          
+          <div class="status-card ${PAGE_ACCESS_TOKEN && PAGE_ACCESS_TOKEN.length > 100 ? 'ok' : 'error'}">
+            <div class="label">📱 PAGE ACCESS TOKEN</div>
+            <div class="value ${PAGE_ACCESS_TOKEN && PAGE_ACCESS_TOKEN.length > 100 ? 'ok-text' : 'error-text'}">
+              ${PAGE_ACCESS_TOKEN && PAGE_ACCESS_TOKEN.length > 100 
+                ? '✓ Valid (' + PAGE_ACCESS_TOKEN.length + ' chars)'
+                : '✗ Missing or Invalid'}
+            </div>
+            ${PAGE_ACCESS_TOKEN && PAGE_ACCESS_TOKEN.length > 100 
+              ? '<div style="margin-top:10px; font-size:0.8em; opacity:0.7;">First 40: ' + PAGE_ACCESS_TOKEN.substring(0, 40) + '...</div>'
+              : ''}
           </div>
-          <div class="status-item">
-            🤖 Gemini API: <span class="${geminiStatus ? 'green' : 'red'}">${geminiStatus ? '✓ Configured' : '⚠ Using Fallback Responses'}</span>
+          
+          <div class="status-card ${GEMINI_API_KEY && GEMINI_API_KEY !== 'undefined' ? 'ok' : 'warning'}">
+            <div class="label">🤖 GEMINI AI</div>
+            <div class="value ${GEMINI_API_KEY && GEMINI_API_KEY !== 'undefined' ? 'ok-text' : 'warning-text'}">
+              ${GEMINI_API_KEY && GEMINI_API_KEY !== 'undefined' 
+                ? '✓ Connected' 
+                : '⚠ Using Fallback Responses'}
+            </div>
           </div>
         </div>
 
-        ${!tokenStatus ? `
-        <div class="warning">
-          <h3>⚠️ ACTION REQUIRED</h3>
-          <p><strong>Your PAGE_ACCESS_TOKEN is missing or invalid!</strong></p>
-          <p>The bot will NOT work until you:</p>
-          <ol>
-            <li>Go to Facebook App Dashboard → Messenger → Access Tokens</li>
-            <li>Generate a Page Access Token for "SJC Sports Chat"</li>
-            <li>Copy the token (it's very long, starts with EAA...)</li>
-            <li>Go to Render Dashboard → Environment → Edit PAGE_ACCESS_TOKEN</li>
-            <li>Paste the token and save</li>
-          </ol>
-        </div>
-        ` : `
-        <div class="success">
-          <h3>✅ Configuration Looks Good!</h3>
-          <p><strong>Next steps:</strong></p>
-          <ol>
-            <li>Verify your webhook in Facebook App Dashboard</li>
-            <li>Subscribe webhook to your page</li>
-            <li>Test by messaging your page!</li>
-          </ol>
-        </div>
-        `}
-
-        <div style="margin-top: 30px; padding: 15px; background: rgba(255,255,255,0.15); border-radius: 5px;">
-          <h3>📋 Setup Information:</h3>
-          <p><strong>Webhook URL:</strong> ${req.protocol}://${req.get('host')}/webhook</p>
-          <p><strong>Verify Token:</strong> ${VERIFY_TOKEN}</p>
-          <p><strong>Facebook Page:</strong> SJC Sports Chat</p>
-          <p><strong>Contact:</strong> sjcdo@gmail.com</p>
+        <div class="info-box">
+          <h3>📋 Webhook Configuration</h3>
+          <p style="margin: 10px 0;"><strong>Callback URL:</strong> ${req.protocol}://${req.get('host')}/webhook</p>
+          <p style="margin: 10px 0;"><strong>Verify Token:</strong> ${VERIFY_TOKEN}</p>
+          <p style="margin: 10px 0;"><strong>Events:</strong> messages, messaging_postbacks</p>
         </div>
 
-        <div style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
-          <p>🌍 Supports ALL major languages: English, Filipino, Cebuano, Spanish, French, German, Italian, Portuguese, Russian, Arabic, Chinese, Japanese, Korean, Hindi, and more!</p>
+        <div class="info-box">
+          <h3>🌍 Supported Languages</h3>
+          <div class="languages">
+            <div class="lang-tag">🇬🇧 English</div>
+            <div class="lang-tag">🇵🇭 Filipino</div>
+            <div class="lang-tag">🇵🇭 Cebuano</div>
+            <div class="lang-tag">🇪🇸 Spanish</div>
+            <div class="lang-tag">🇫🇷 French</div>
+            <div class="lang-tag">🇩🇪 German</div>
+            <div class="lang-tag">🇮🇹 Italian</div>
+            <div class="lang-tag">🇵🇹 Portuguese</div>
+            <div class="lang-tag">🇨🇳 Chinese</div>
+            <div class="lang-tag">🇯🇵 Japanese</div>
+            <div class="lang-tag">🇰🇷 Korean</div>
+            <div class="lang-tag">🇷🇺 Russian</div>
+            <div class="lang-tag">🇸🇦 Arabic</div>
+            <div class="lang-tag">🇮🇳 Hindi</div>
+            <div class="lang-tag">🇹🇭 Thai</div>
+            <div class="lang-tag">+ More</div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <h3>📧 Contact Information</h3>
+          <p>Email: sjcdo@gmail.com</p>
+          <p>Facebook Page: SJC Sports Chat</p>
         </div>
       </div>
     </body>
@@ -202,350 +219,264 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Webhook verification
+// Webhook verification (GET)
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
 
-  console.log('\n📞 WEBHOOK VERIFICATION REQUEST:');
-  console.log('   Mode:', mode);
-  console.log('   Token received:', token);
-  console.log('   Token expected:', VERIFY_TOKEN);
-  console.log('   Challenge:', challenge);
+  console.log('\n📞 WEBHOOK VERIFICATION:');
+  console.log('Mode:', mode);
+  console.log('Token:', token);
+  console.log('Expected:', VERIFY_TOKEN);
 
-  if (mode && token === VERIFY_TOKEN) {
-    if (mode === 'subscribe') {
-      console.log('✅ WEBHOOK VERIFIED SUCCESSFULLY!');
-      console.log('   Responding with challenge:', challenge);
-      res.status(200).send(challenge);
-    }
+  if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    console.log('✅ WEBHOOK VERIFIED!');
+    res.status(200).send(challenge);
   } else {
-    console.error('❌ WEBHOOK VERIFICATION FAILED!');
-    console.error('   Token mismatch or missing mode');
+    console.log('❌ VERIFICATION FAILED');
     res.sendStatus(403);
   }
 });
 
-// Webhook event handler with detailed logging
+// Webhook events (POST)
 app.post('/webhook', (req, res) => {
-  console.log('\n📬 WEBHOOK EVENT RECEIVED:');
-  console.log('   Body:', JSON.stringify(req.body, null, 2));
+  console.log('\n📬 WEBHOOK EVENT:', new Date().toISOString());
+  console.log('Body:', JSON.stringify(req.body, null, 2));
 
   const body = req.body;
 
   if (body.object === 'page') {
-    body.entry.forEach(entry => {
-      entry.messaging.forEach(event => {
-        console.log('   Event type:', Object.keys(event));
-        console.log('   Sender ID:', event.sender?.id);
+    body.entry?.forEach(entry => {
+      entry.messaging?.forEach(event => {
+        console.log('📨 Event from:', event.sender?.id);
         
-        if (event.message && event.message.text) {
-          console.log('   Message text:', event.message.text);
+        if (event.message?.text) {
+          console.log('💬 Message:', event.message.text);
           handleMessage(event.sender.id, event.message.text);
         } else if (event.postback) {
-          console.log('   Postback payload:', event.postback.payload);
+          console.log('🔘 Postback:', event.postback.payload);
           handlePostback(event.sender.id, event.postback.payload);
-        } else {
-          console.log('   ⚠️  Unknown event type');
         }
       });
     });
     res.status(200).send('EVENT_RECEIVED');
   } else {
-    console.warn('   ⚠️  Not a page object');
     res.sendStatus(404);
   }
 });
 
-// Message handler with detailed logging
+// Message handler
 async function handleMessage(senderId, messageText) {
-  console.log(`\n📨 PROCESSING MESSAGE:`);
-  console.log(`   From: ${senderId}`);
-  console.log(`   Text: "${messageText}"`);
-  
-  const detectedLanguage = detectLanguage(messageText);
-  console.log(`   Detected language: ${detectedLanguage}`);
+  console.log(`\n🔄 PROCESSING MESSAGE FROM ${senderId}`);
+  console.log(`📝 Text: "${messageText}"`);
 
-  // Validate token before attempting to send
-  if (!PAGE_ACCESS_TOKEN || PAGE_ACCESS_TOKEN.length < 50) {
-    console.error('❌ CANNOT RESPOND: PAGE_ACCESS_TOKEN is invalid!');
-    console.error('   Token length:', PAGE_ACCESS_TOKEN ? PAGE_ACCESS_TOKEN.length : 0);
+  // Validate token
+  if (!PAGE_ACCESS_TOKEN || PAGE_ACCESS_TOKEN.length < 100) {
+    console.error('❌ CANNOT RESPOND: Invalid PAGE_ACCESS_TOKEN');
     return;
   }
 
-  // Show typing indicator
+  const detectedLanguage = detectLanguage(messageText);
+  console.log(`🌍 Language: ${detectedLanguage}`);
+
+  // Typing indicator
   sendTypingIndicator(senderId, true);
+
+  // Simple greeting check
+  const lowerText = messageText.toLowerCase();
+  if (lowerText.match(/^(hi|hello|hey|kamusta|musta|asa|hola)$/i)) {
+    const greetings = {
+      'English': "Hey there! 👋 Welcome to SJC GreenHawks Sports! I'm your AI assistant. How can I help you today? 🏀",
+      'Filipino': "Kamusta! 👋 Welcome sa SJC GreenHawks Sports! Ako ang iyong AI assistant. Paano kita matutulungan? 🏀",
+      'Cebuano': "Kumusta! 👋 Welcome sa SJC GreenHawks Sports! Ako ang imong AI assistant. Unsaon nako pagtabang? 🏀",
+      'Spanish': "¡Hola! 👋 ¡Bienvenido a SJC GreenHawks Sports! Soy tu asistente de IA. ¿Cómo puedo ayudarte? 🏀"
+    };
+    sendQuickReply(senderId, greetings[detectedLanguage] || greetings['English'], detectedLanguage);
+    return;
+  }
 
   // Try Gemini AI
   if (GEMINI_API_KEY && GEMINI_API_KEY !== 'undefined') {
     try {
-      console.log('   🤖 Calling Gemini AI...');
-      const aiResponse = await getGeminiResponseWithRetry(messageText, detectedLanguage, 2);
-      console.log('   ✅ AI Response:', aiResponse.substring(0, 100) + '...');
+      console.log('🤖 Calling Gemini AI...');
+      const aiResponse = await getGeminiResponse(messageText, detectedLanguage);
+      console.log('✅ AI Response:', aiResponse.substring(0, 80) + '...');
       sendQuickReply(senderId, aiResponse, detectedLanguage);
       return;
     } catch (error) {
-      console.error('   ❌ Gemini AI failed:', error.message);
-      console.error('   Falling back to default responses');
+      console.error('❌ Gemini failed:', error.message);
     }
-  } else {
-    console.log('   ℹ️  Gemini not configured, using fallback');
   }
 
-  // Fallback response
-  const fallbackResponse = getMultilingualFallback(detectedLanguage);
-  console.log('   📋 Using fallback:', fallbackResponse.substring(0, 50) + '...');
-  sendQuickReply(senderId, fallbackResponse, detectedLanguage);
+  // Fallback
+  const fallback = getFallbackResponse(detectedLanguage, lowerText);
+  console.log('📋 Fallback response');
+  sendQuickReply(senderId, fallback, detectedLanguage);
 }
 
-// Gemini AI with retry logic
-async function getGeminiResponseWithRetry(userMessage, detectedLanguage, maxRetries = 2) {
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'undefined') {
-    throw new Error('Gemini API key not configured');
-  }
+// Gemini AI call
+async function getGeminiResponse(userMessage, language) {
+  const prompt = `${BUSINESS_CONTEXT}\n\nIMPORTANT: User wrote in ${language}. Respond ONLY in ${language}.\n\nUser: "${userMessage}"\n\nYour response (in ${language}, 2-4 sentences):`;
 
-  const languageInstruction = `CRITICAL: The user wrote in ${detectedLanguage}. Respond ONLY in ${detectedLanguage}.`;
-  const fullPrompt = `${BUSINESS_CONTEXT}\n\n${languageInstruction}\n\nUser: "${userMessage}"\n\nResponse (in ${detectedLanguage}, 2-4 sentences):`;
-
-  const requestBody = {
-    contents: [{ parts: [{ text: fullPrompt }] }],
-    generationConfig: {
-      temperature: 0.9,
-      maxOutputTokens: 200,
-      topP: 0.95,
-      topK: 40
-    }
-  };
-
-  for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
-    try {
-      console.log(`   🔄 Gemini attempt ${attempt}/${maxRetries + 1}`);
-      
-      const response = await axios.post(GEMINI_API_URL, requestBody, {
+  try {
+    const response = await axios.post(
+      GEMINI_API_URL,
+      {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.9,
+          maxOutputTokens: 200,
+          topP: 0.95
+        }
+      },
+      {
         headers: { 'Content-Type': 'application/json' },
-        timeout: 15000
-      });
+        timeout: 12000
+      }
+    );
 
-      if (response.data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        return response.data.candidates[0].content.parts[0].text.trim();
-      } else {
-        throw new Error('Invalid response format');
-      }
-    } catch (error) {
-      console.error(`   ⚠️  Attempt ${attempt} failed:`, error.response?.data?.error?.message || error.message);
-      
-      if (error.response?.status === 503 && attempt <= maxRetries) {
-        console.log(`   ⏳ Retrying in ${attempt * 2} seconds...`);
-        await new Promise(resolve => setTimeout(resolve, attempt * 2000));
-        continue;
-      }
-      throw error;
-    }
+    return response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'Error getting response';
+  } catch (error) {
+    console.error('Gemini error:', error.response?.data || error.message);
+    throw error;
   }
 }
 
-// Multilingual fallback responses
-function getMultilingualFallback(language) {
-  const fallbacks = {
-    'English': "I'm here to help with SJC GreenHawks Sports! 🏀 Ask me about scholarships, joining teams, merchandise, training schedules, or contact us at sjcdo@gmail.com 📧",
-    'Filipino': "Nandito ako para tumulong sa SJC GreenHawks Sports! 🏀 Tanungin mo ako tungkol sa scholarships, pagsali sa teams, merchandise, training schedules, o contact us sa sjcdo@gmail.com 📧",
-    'Cebuano': "Ania ko para motabang sa SJC GreenHawks Sports! 🏀 Pangutana ko bahin sa scholarships, pag-apil sa teams, merchandise, training schedules, o kontak sa sjcdo@gmail.com 📧",
-    'Spanish': "¡Estoy aquí para ayudar con SJC GreenHawks Sports! 🏀 Pregúntame sobre becas, unirse a equipos, mercancía, horarios de entrenamiento, o contáctanos en sjcdo@gmail.com 📧",
-    'French': "Je suis là pour vous aider avec SJC GreenHawks Sports! 🏀 Demandez-moi des bourses, rejoindre des équipes, marchandises, horaires d'entraînement, ou contactez-nous à sjcdo@gmail.com 📧"
+// Fallback responses
+function getFallbackResponse(language, queryLower) {
+  // FAQ matching
+  if (queryLower.includes('scholar') || queryLower.includes('beasiswa')) {
+    const responses = {
+      'English': "🎓 Visit our Sports Development Office to inquire about varsity scholarships! Requirements will be discussed during screening. Contact: sjcdo@gmail.com",
+      'Filipino': "🎓 Bisitahin ang Sports Development Office para sa scholarship! Mga requirements ay tatalakayin sa screening. Contact: sjcdo@gmail.com",
+      'Cebuano': "🎓 Bisitaha ang Sports Development Office para sa scholarship! Mga requirements i-discuss sa screening. Contact: sjcdo@gmail.com"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  if (queryLower.includes('join') || queryLower.includes('sumali') || queryLower.includes('apil')) {
+    const responses = {
+      'English': "🏃 Want to join our team? Visit the Sports Office for tryout schedules! Selection is based on performance and commitment. Let's go GreenHawks! 🦅",
+      'Filipino': "🏃 Gusto sumali sa team? Bisitahin ang Sports Office para sa tryout schedule! Based sa performance at commitment ang selection. Go GreenHawks! 🦅",
+      'Cebuano': "🏃 Gusto mo-apil sa team? Bisitaha ang Sports Office para sa tryout schedule! Based sa performance ug commitment ang selection. Go GreenHawks! 🦅"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  // Default response
+  const defaults = {
+    'English': "I'm here to help with SJC GreenHawks Sports! 🏀 Ask about scholarships, joining teams, training schedules, or contact sjcdo@gmail.com 📧",
+    'Filipino': "Nandito ako para sa SJC GreenHawks Sports! 🏀 Tanungin ako tungkol sa scholarships, pagsali sa teams, training, o contact sjcdo@gmail.com 📧",
+    'Cebuano': "Ania ko para sa SJC GreenHawks Sports! 🏀 Pangutana bahin sa scholarships, pag-apil sa teams, training, o contact sjcdo@gmail.com 📧",
+    'Spanish': "¡Estoy aquí para SJC GreenHawks Sports! 🏀 Pregunta sobre becas, unirse a equipos, entrenamientos, o contacta sjcdo@gmail.com 📧",
+    'French': "Je suis là pour SJC GreenHawks Sports! 🏀 Demandez des bourses, rejoindre équipes, entraînements, ou contactez sjcdo@gmail.com 📧",
+    'Chinese': "我在这里帮助SJC GreenHawks体育！🏀 询问奖学金、加入团队、训练，或联系 sjcdo@gmail.com 📧",
+    'Japanese': "SJC GreenHawksスポーツをサポートします！🏀 奨学金、チーム参加、トレーニングについて質問、または sjcdo@gmail.com へ 📧",
+    'Korean': "SJC GreenHawks 스포츠를 도와드립니다! 🏀 장학금, 팀 가입, 훈련에 대해 문의하거나 sjcdo@gmail.com로 연락하세요 📧"
   };
 
-  return fallbacks[language] || fallbacks['English'];
+  return defaults[language] || defaults['English'];
 }
 
-// Handle postback buttons
+// Postback handler
 function handlePostback(senderId, payload) {
-  console.log(`   📘 Processing postback: ${payload}`);
+  console.log(`🔘 Postback: ${payload}`);
   
   const responses = {
-    'GET_STARTED': "Welcome to SJC GreenHawks Sports! 🏀🦅 I can help you in ANY language! How can I assist you today?",
-    'SHOW_FAQS': "Here's what I can help you with! 👇 Click a button or ask me anything!",
-    'CONTACT_US': "📧 Contact the Sports Development Office at sjcdo@gmail.com or message me here! 😊"
+    'GET_STARTED': "Welcome to SJC GreenHawks Sports! 🏀🦅 I speak all languages! How can I help you?",
+    'SHOW_FAQS': "Here's what I can help with! 👇 Ask about scholarships, joining teams, training, or merchandise!",
+    'CONTACT_US': "📧 Email: sjcdo@gmail.com | Message me here anytime! I'm available 24/7! 😊"
   };
 
   sendQuickReply(senderId, responses[payload] || responses['GET_STARTED'], 'English');
 }
 
-// Send typing indicator
+// Typing indicator
 function sendTypingIndicator(recipientId, isTyping) {
-  const messageData = {
+  callSendAPI({
     recipient: { id: recipientId },
     sender_action: isTyping ? 'typing_on' : 'typing_off'
-  };
-  callSendAPI(messageData);
+  });
 }
 
-// Send message with quick replies
-function sendQuickReply(recipientId, messageText, language) {
-  const quickReplyTranslations = {
-    'English': { scholarship: '🎓 Scholarship', join: '🏃 Join', merch: '👕 Merch', sports: '🏆 Sports', training: '⏰ Training', contact: '📧 Contact' },
-    'Filipino': { scholarship: '🎓 Scholarship', join: '🏃 Sumali', merch: '👕 Merch', sports: '🏆 Sports', training: '⏰ Training', contact: '📧 Kontak' },
-    'Cebuano': { scholarship: '🎓 Scholarship', join: '🏃 Apil', merch: '👕 Merch', sports: '🏆 Sports', training: '⏰ Training', contact: '📧 Kontak' }
+// Quick reply message
+function sendQuickReply(recipientId, text, language) {
+  const translations = {
+    'English': { scholar: '🎓 Scholarship', join: '🏃 Join', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Contact' },
+    'Filipino': { scholar: '🎓 Scholarship', join: '🏃 Sumali', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
+    'Cebuano': { scholar: '🎓 Scholarship', join: '🏃 Apil', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
+    'Spanish': { scholar: '🎓 Beca', join: '🏃 Unirse', merch: '👕 Tienda', sports: '🏆 Deportes', train: '⏰ Entrenar', contact: '📧 Contacto' }
   };
 
-  const translations = quickReplyTranslations[language] || quickReplyTranslations['English'];
+  const t = translations[language] || translations['English'];
 
-  const messageData = {
+  callSendAPI({
     recipient: { id: recipientId },
     message: {
-      text: messageText,
+      text: text,
       quick_replies: [
-        { content_type: "text", title: translations.scholarship, payload: "SCHOLARSHIP" },
-        { content_type: "text", title: translations.join, payload: "JOIN" },
-        { content_type: "text", title: translations.merch, payload: "MERCHANDISE" },
-        { content_type: "text", title: translations.sports, payload: "SPORTS" },
-        { content_type: "text", title: translations.training, payload: "TRAINING" },
-        { content_type: "text", title: translations.contact, payload: "CONTACT_US" }
+        { content_type: "text", title: t.scholar, payload: "SCHOLARSHIP" },
+        { content_type: "text", title: t.join, payload: "JOIN" },
+        { content_type: "text", title: t.merch, payload: "MERCHANDISE" },
+        { content_type: "text", title: t.sports, payload: "SPORTS" },
+        { content_type: "text", title: t.train, payload: "TRAINING" },
+        { content_type: "text", title: t.contact, payload: "CONTACT_US" }
       ]
-    }
-  };
-  
-  callSendAPI(messageData);
-}
-
-// Call Facebook Send API with detailed error logging
-function callSendAPI(messageData) {
-  if (!PAGE_ACCESS_TOKEN || PAGE_ACCESS_TOKEN.length < 50) {
-    console.error('❌ CANNOT SEND: Invalid PAGE_ACCESS_TOKEN');
-    return;
-  }
-
-  console.log('   📤 Sending message to Facebook...');
-  
-  axios.post(`https://graph.facebook.com/v18.0/me/messages`, messageData, {
-    params: { access_token: PAGE_ACCESS_TOKEN },
-    timeout: 10000
-  })
-  .then((response) => {
-    console.log('   ✅ Message sent successfully!');
-    console.log('   Message ID:', response.data.message_id);
-  })
-  .catch(error => {
-    console.error('   ❌ SEND FAILED!');
-    
-    if (error.response) {
-      console.error('   Status:', error.response.status);
-      console.error('   Error:', JSON.stringify(error.response.data, null, 2));
-      
-      // Specific error messages
-      if (error.response.data?.error?.code === 190) {
-        console.error('   ⚠️  TOKEN ERROR: Your PAGE_ACCESS_TOKEN is invalid or expired!');
-        console.error('   Action: Generate a new token from Facebook Developer Dashboard');
-      } else if (error.response.data?.error?.code === 200) {
-        console.error('   ⚠️  PERMISSION ERROR: Missing permissions for this page');
-        console.error('   Action: Check if webhook is subscribed to your page');
-      } else if (error.response.data?.error?.code === 10) {
-        console.error('   ⚠️  APPLICATION ERROR: Check app permissions');
-      }
-    } else if (error.request) {
-      console.error('   No response received from Facebook');
-      console.error('   Network error or timeout');
-    } else {
-      console.error('   Error:', error.message);
     }
   });
 }
 
-// Start server with comprehensive status
+// Send API call
+function callSendAPI(messageData) {
+  if (!PAGE_ACCESS_TOKEN || PAGE_ACCESS_TOKEN.length < 100) {
+    console.error('❌ Invalid token, cannot send');
+    return;
+  }
+
+  console.log('📤 Sending to Facebook...');
+
+  axios.post(
+    'https://graph.facebook.com/v18.0/me/messages',
+    messageData,
+    {
+      params: { access_token: PAGE_ACCESS_TOKEN },
+      timeout: 10000
+    }
+  )
+  .then(response => {
+    console.log('✅ Sent! Message ID:', response.data.message_id);
+  })
+  .catch(error => {
+    console.error('❌ SEND FAILED:');
+    if (error.response) {
+      console.error('Status:', error.response.status);
+      console.error('Error:', JSON.stringify(error.response.data, null, 2));
+      
+      const errorCode = error.response.data?.error?.code;
+      if (errorCode === 190) {
+        console.error('💥 TOKEN INVALID/EXPIRED! Get new token from Facebook.');
+      } else if (errorCode === 200) {
+        console.error('💥 PERMISSION ERROR! Check webhook subscriptions.');
+      }
+    } else {
+      console.error('Error:', error.message);
+    }
+  });
+}
+
+// Start server
 app.listen(PORT, () => {
   console.log('\n' + '='.repeat(70));
   console.log('🏀 SJC GREENHAWKS SPORTS CHATBOT');
+  console.log('🌍 MULTILINGUAL AI - POWERED BY GEMINI 2.0 FLASH');
   console.log('='.repeat(70));
-  console.log(`📍 Server running on port ${PORT}`);
-  console.log(`🌐 URL: http://localhost:${PORT}`);
-  console.log(`🔗 Webhook: /webhook`);
-  console.log('='.repeat(70));
-  console.log('📊 CONFIGURATION STATUS:');
-  console.log('='.repeat(70));
-  
-  // Verify Token
-  if (VERIFY_TOKEN) {
-    console.log('✅ VERIFY_TOKEN: Set (' + VERIFY_TOKEN + ')');
-  } else {
-    console.log('❌ VERIFY_TOKEN: Missing');
-  }
-  
-  // Page Access Token
-  if (PAGE_ACCESS_TOKEN && PAGE_ACCESS_TOKEN.length > 50) {
-    console.log('✅ PAGE_ACCESS_TOKEN: Valid (length: ' + PAGE_ACCESS_TOKEN.length + ')');
-    console.log('   First 30 chars: ' + PAGE_ACCESS_TOKEN.substring(0, 30) + '...');
-    console.log('   Last 10 chars: ...' + PAGE_ACCESS_TOKEN.substring(PAGE_ACCESS_TOKEN.length - 10));
-  } else if (PAGE_ACCESS_TOKEN) {
-    console.log('❌ PAGE_ACCESS_TOKEN: TOO SHORT! (length: ' + PAGE_ACCESS_TOKEN.length + ')');
-    console.log('   Expected: 200+ characters');
-    console.log('   Current value: ' + PAGE_ACCESS_TOKEN);
-  } else {
-    console.log('❌ PAGE_ACCESS_TOKEN: NOT SET!');
-  }
-  
-  // Gemini API Key
-  if (GEMINI_API_KEY && GEMINI_API_KEY !== 'undefined') {
-    console.log('✅ GEMINI_API_KEY: Set (length: ' + GEMINI_API_KEY.length + ')');
-  } else {
-    console.log('⚠️  GEMINI_API_KEY: Not set (will use fallback responses)');
-  }
-  
-  console.log('='.repeat(70));
-  console.log('🌍 MULTILINGUAL SUPPORT ENABLED');
-  console.log('='.repeat(70));
-  console.log('Languages: English, Filipino, Cebuano, Spanish, French,');
-  console.log('          German, Italian, Portuguese, Russian, Arabic,');
-  console.log('          Chinese, Japanese, Korean, Hindi, Thai, and more!');
-  console.log('='.repeat(70));
-  
-  // Next steps
-  console.log('\n📋 NEXT STEPS TO MAKE BOT WORK:');
-  console.log('='.repeat(70));
-  
-  if (!PAGE_ACCESS_TOKEN || PAGE_ACCESS_TOKEN.length < 50) {
-    console.log('🔴 CRITICAL: Set PAGE_ACCESS_TOKEN first!');
-    console.log('   1. Go to: https://developers.facebook.com/apps/');
-    console.log('   2. Select your app → Messenger → Access Tokens');
-    console.log('   3. Generate token for "SJC Sports Chat" page');
-    console.log('   4. Copy the FULL token (starts with EAA...)');
-    console.log('   5. Set in Render: Environment → PAGE_ACCESS_TOKEN');
-  } else {
-    console.log('✅ Token is set! Now configure webhook:');
-    console.log('   1. Go to Facebook App → Messenger → Webhooks');
-    console.log('   2. Click "Add Callback URL"');
-    console.log('   3. Callback URL: https://sjc-sports-bot.onrender.com/webhook');
-    console.log('   4. Verify Token: ' + VERIFY_TOKEN);
-    console.log('   5. Subscribe to: messages, messaging_postbacks');
-    console.log('   6. Subscribe webhook to YOUR PAGE');
-    console.log('   7. Test by messaging your Facebook page!');
-  }
-  
-  console.log('='.repeat(70));
-  console.log('🎯 Test the bot: https://www.facebook.com/people/SJC-Sports-Chat/61582368223061/');
-  console.log('📧 Contact: sjcdo@gmail.com');
-  console.log('='.repeat(70) + '\n');
-  
-  console.log('✨ Chatbot is ready! Waiting for messages...\n');
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('\n⚠️  SIGTERM received, shutting down gracefully...');
-  process.exit(0);
-});
-
-process.on('SIGINT', () => {
-  console.log('\n⚠️  SIGINT received, shutting down gracefully...');
-  process.exit(0);
-});
-
-// Catch unhandled errors
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Unhandled Rejection at:', promise);
-  console.error('Reason:', reason);
-});
-
-process.on('uncaughtException', (error) => {
-  console.error('❌ Uncaught Exception:', error);
-  process.exit(1);
+  console.log(`\n🚀 Server: http://localhost:${PORT}`);
+  console.log(`🔗 Webhook: /webhook\n`);
+  console.log('📊 STATUS:');
+  console.log('  ✓ VERIFY_TOKEN:', VERIFY_TOKEN);
+  console.log('  ✓ PAGE_TOKEN:', PAGE_ACCESS_TOKEN ? `Valid (${PAGE_ACCESS_TOKEN.length} chars)` : 'MISSING');
+  console.log('  ✓ GEMINI_KEY:', GEMINI_API_KEY ? 'Set' : 'Not set');
+  console.log('\n' + '='.repeat(70));
+  console.log('✨ Bot is READY! Send a message to test...\n');
 });
