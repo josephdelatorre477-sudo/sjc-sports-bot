@@ -6,10 +6,10 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
-// Configuration
-const VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'sjc_sports_2025_verify';
+// Configuration - UPDATED TO MATCH YOUR ENVIRONMENT
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN || '5% .spot\'s_200s_vest5y'; // Match your env exactly
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.SENSUE_API_KEY; // Added fallback
 const PORT = process.env.PORT || 3000;
 
 // Validate configuration
@@ -153,7 +153,7 @@ app.get('/', (req, res) => {
           <div class="status-card ${VERIFY_TOKEN ? 'ok' : 'error'}">
             <div class="label">🔑 VERIFY TOKEN</div>
             <div class="value ${VERIFY_TOKEN ? 'ok-text' : 'error-text'}">
-              ${VERIFY_TOKEN ? '✓ ' + VERIFY_TOKEN : '✗ Not Set'}
+              ${VERIFY_TOKEN ? '✓ Set (Matches Facebook)' : '✗ Not Set'}
             </div>
           </div>
           
@@ -181,9 +181,10 @@ app.get('/', (req, res) => {
 
         <div class="info-box">
           <h3>📋 Webhook Configuration</h3>
-          <p style="margin: 10px 0;"><strong>Callback URL:</strong> ${req.protocol}://${req.get('host')}/webhook</p>
+          <p style="margin: 10px 0;"><strong>Callback URL:</strong> https://sjc-sports-bot.onrender.com/webhook</p>
           <p style="margin: 10px 0;"><strong>Verify Token:</strong> ${VERIFY_TOKEN}</p>
           <p style="margin: 10px 0;"><strong>Events:</strong> messages, messaging_postbacks</p>
+          <p style="margin: 10px 0; color: #ffeb3b;"><strong>⚠ IMPORTANT:</strong> Use EXACTLY this verify token in Facebook Developer settings</p>
         </div>
 
         <div class="info-box">
@@ -219,49 +220,59 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Webhook verification (GET)
+// Webhook verification (GET) - ENHANCED DEBUGGING
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
 
-  console.log('\n📞 WEBHOOK VERIFICATION:');
+  console.log('\n📞 WEBHOOK VERIFICATION ATTEMPT:');
   console.log('Mode:', mode);
-  console.log('Token:', token);
-  console.log('Expected:', VERIFY_TOKEN);
+  console.log('Token Received:', token);
+  console.log('Token Expected:', VERIFY_TOKEN);
+  console.log('Challenge:', challenge);
 
   if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-    console.log('✅ WEBHOOK VERIFIED!');
+    console.log('✅ WEBHOOK VERIFIED SUCCESSFULLY!');
     res.status(200).send(challenge);
   } else {
-    console.log('❌ VERIFICATION FAILED');
+    console.log('❌ WEBHOOK VERIFICATION FAILED');
+    console.log('Reason:', mode !== 'subscribe' ? 'Wrong mode' : 'Token mismatch');
     res.sendStatus(403);
   }
 });
 
-// Webhook events (POST)
+// Webhook events (POST) - ENHANCED LOGGING
 app.post('/webhook', (req, res) => {
-  console.log('\n📬 WEBHOOK EVENT:', new Date().toISOString());
-  console.log('Body:', JSON.stringify(req.body, null, 2));
-
+  console.log('\n📬 WEBHOOK EVENT RECEIVED:', new Date().toISOString());
+  
   const body = req.body;
 
   if (body.object === 'page') {
-    body.entry?.forEach(entry => {
-      entry.messaging?.forEach(event => {
-        console.log('📨 Event from:', event.sender?.id);
+    console.log('📄 Page event received');
+    
+    body.entry?.forEach((entry, index) => {
+      console.log(`📦 Entry ${index}:`, entry.id);
+      
+      entry.messaging?.forEach((event, eventIndex) => {
+        console.log(`\n🎯 Event ${eventIndex}:`);
+        console.log('   Sender:', event.sender?.id);
         
         if (event.message?.text) {
-          console.log('💬 Message:', event.message.text);
+          console.log('   💬 Message:', event.message.text);
           handleMessage(event.sender.id, event.message.text);
         } else if (event.postback) {
-          console.log('🔘 Postback:', event.postback.payload);
+          console.log('   🔘 Postback:', event.postback.payload);
           handlePostback(event.sender.id, event.postback.payload);
+        } else {
+          console.log('   📋 Other event type:', Object.keys(event).join(', '));
         }
       });
     });
+    
     res.status(200).send('EVENT_RECEIVED');
   } else {
+    console.log('❌ Invalid object type:', body.object);
     res.sendStatus(404);
   }
 });
@@ -735,15 +746,27 @@ app.get('/terms', (req, res) => {
           border-bottom: 3px solid #2a5298;
           padding-bottom: 15px;
         }
+        .effective-date {
+          color: #666;
+          font-size: 0.9em;
+          margin-bottom: 30px;
+        }
         h2 {
           color: #2a5298;
           font-size: 1.5em;
           margin-top: 30px;
           margin-bottom: 15px;
         }
-        p { margin-bottom: 15px; }
-        ul { margin: 15px 0 15px 30px; }
-        li { margin-bottom: 10px; }
+        p {
+          margin-bottom: 15px;
+          text-align: justify;
+        }
+        ul {
+          margin: 15px 0 15px 30px;
+        }
+        li {
+          margin-bottom: 10px;
+        }
         .footer {
           text-align: center;
           margin-top: 40px;
@@ -752,63 +775,79 @@ app.get('/terms', (req, res) => {
           color: #666;
           font-size: 0.9em;
         }
+        .highlight {
+          background: #fff3cd;
+          padding: 2px 6px;
+          border-radius: 3px;
+        }
       </style>
     </head>
     <body>
       <div class="container">
         <h1>🏀 Terms of Service</h1>
-        <p><strong>Effective Date:</strong> October 23, 2025</p>
+        <p class="effective-date"><strong>Effective Date:</strong> October 23, 2025</p>
+        <p class="effective-date"><strong>Service:</strong> SJC GreenHawks Sports Chatbot on Facebook Messenger</p>
 
         <h2>1. Acceptance of Terms</h2>
         <p>
-          By using the SJC GreenHawks Sports Bot, you agree to these Terms of Service. 
-          If you do not agree, please do not use the service.
+          By accessing and using the SJC GreenHawks Sports Chatbot ("the Service"), you agree to be bound by these 
+          Terms of Service and our Privacy Policy. If you do not agree with any part of these terms, you must not use our Service.
         </p>
 
-        <h2>2. Service Description</h2>
+        <h2>2. Description of Service</h2>
         <p>
-          The SJC Sports Bot is an AI-powered chatbot that provides information about:
+          The SJC Sports Bot is an AI-powered chatbot that provides information about Saint Joseph College's 
+          sports programs, including:
         </p>
         <ul>
-          <li>Sports programs and teams at Saint Joseph College</li>
-          <li>Varsity scholarships and application processes</li>
-          <li>Training schedules and tryout information</li>
-          <li>Sports merchandise and events</li>
+          <li>Information about sports teams and varsity scholarships</li>
+          <li>Tryout schedules and requirements</li>
+          <li>Training programs and schedules</li>
+          <li>Merchandise information</li>
+          <li>General inquiries about SJC sports</li>
         </ul>
-
-        <h2>3. User Responsibilities</h2>
-        <p>You agree to:</p>
-        <ul>
-          <li>Provide accurate information when requesting assistance</li>
-          <li>Use the service for its intended purpose only</li>
-          <li>Not attempt to hack, abuse, or disrupt the service</li>
-          <li>Comply with Facebook's Terms of Service</li>
-        </ul>
-
-        <h2>4. Disclaimer</h2>
         <p>
-          The information provided by the bot is for general guidance only. For official 
-          information regarding scholarships, enrollment, and policies, please contact 
-          the Sports Development Office directly at sjcdo@gmail.com.
+          The Service is provided "as is" and we reserve the right to modify or discontinue the Service at any time.
+        </p>
+
+        <h2>3. User Conduct</h2>
+        <p>You agree not to:</p>
+        <ul>
+          <li>Use the Service for any illegal or unauthorized purpose</li>
+          <li>Send spam, abusive, harassing, or inappropriate content</li>
+          <li>Attempt to hack, disrupt, or overload the Service</li>
+          <li>Impersonate any person or entity</li>
+          <li>Use automated systems to interact with the bot</li>
+        </ul>
+
+        <h2>4. Intellectual Property</h2>
+        <p>
+          All content provided through the Service, including but not limited to text, graphics, logos, and 
+          the SJC GreenHawks name, are the property of Saint Joseph College and are protected by intellectual 
+          property laws.
         </p>
 
         <h2>5. Limitation of Liability</h2>
         <p>
-          SJC and the Sports Development Office are not liable for any decisions made 
-          based on information provided by the chatbot. The service is provided "as is" 
-          without warranties of any kind.
+          The Service is provided for informational purposes only. While we strive for accuracy, we do not 
+          guarantee that all information provided is complete, accurate, or up-to-date. Saint Joseph College 
+          shall not be liable for any damages arising from your use of the Service.
         </p>
 
-        <h2>6. Contact</h2>
+        <h2>6. Contact Information</h2>
         <p>
-          <strong>Saint Joseph College - Sports Development Office</strong><br>
-          Email: sjcdo@gmail.com<br>
-          Location: Tungka-tunga, Maasin City, Southern Leyte, Philippines
+          For questions about these Terms of Service, please contact:<br>
+          <strong>SJC Sports Development Office</strong><br>
+          📧 Email: sjcdo@gmail.com<br>
+          📍 Location: Tungka-tunga, Maasin City, Southern Leyte, Philippines
         </p>
 
         <div class="footer">
-          <p><strong>© 2025 Saint Joseph College</strong></p>
-          <p>🏀 Go GreenHawks! 🦅</p>
+          <p><strong>© 2025 Saint Joseph College - Sports Development Office</strong></p>
+          <p>All rights reserved.</p>
+          <p style="margin-top: 10px;">
+            🏀 Go GreenHawks! 🦅
+          </p>
         </div>
       </div>
     </body>
@@ -818,18 +857,15 @@ app.get('/terms', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log('\n' + '='.repeat(70));
-  console.log('🏀 SJC GREENHAWKS SPORTS CHATBOT');
-  console.log('🌍 MULTILINGUAL AI - POWERED BY GEMINI 2.0 FLASH');
-  console.log('='.repeat(70));
-  console.log(`\n🚀 Server: http://localhost:${PORT}`);
-  console.log(`🔗 Webhook: /webhook`);
-  console.log(`📄 Privacy Policy: /privacy`);
-  console.log(`📜 Terms of Service: /terms\n`);
-  console.log('📊 STATUS:');
-  console.log('  ✓ VERIFY_TOKEN:', VERIFY_TOKEN);
-  console.log('  ✓ PAGE_TOKEN:', PAGE_ACCESS_TOKEN ? `Valid (${PAGE_ACCESS_TOKEN.length} chars)` : 'MISSING');
-  console.log('  ✓ GEMINI_KEY:', GEMINI_API_KEY ? 'Set' : 'Not set');
-  console.log('\n' + '='.repeat(70));
-  console.log('✨ Bot is READY! Send a message to test...\n');
+  console.log('\n' + '='.repeat(60));
+  console.log('🏀 SJC GREENHAWKS SPORTS BOT STARTED!');
+  console.log('='.repeat(60));
+  console.log(`📍 Server running on port: ${PORT}`);
+  console.log(`🌐 Status page: https://sjc-sports-bot.onrender.com`);
+  console.log(`🔗 Webhook URL: https://sjc-sports-bot.onrender.com/webhook`);
+  console.log(`🔑 Verify Token: ${VERIFY_TOKEN}`);
+  console.log('='.repeat(60));
+  console.log('🚀 Ready to receive webhook events from Facebook!');
+  console.log('💡 Make sure your webhook is subscribed in Facebook Developer');
+  console.log('='.repeat(60) + '\n');
 });
