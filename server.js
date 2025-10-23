@@ -465,6 +465,357 @@ function callSendAPI(messageData) {
   });
 }
 
+// Privacy Policy route
+app.get('/privacy', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Privacy Policy - SJC Sports Bot</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: 'Segoe UI', Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+          padding: 20px;
+          min-height: 100vh;
+        }
+        .container {
+          max-width: 900px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 15px;
+          padding: 40px;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+          color: #1e3c72;
+          font-size: 2.5em;
+          margin-bottom: 10px;
+          border-bottom: 3px solid #2a5298;
+          padding-bottom: 15px;
+        }
+        .effective-date {
+          color: #666;
+          font-size: 0.9em;
+          margin-bottom: 30px;
+        }
+        h2 {
+          color: #2a5298;
+          font-size: 1.5em;
+          margin-top: 30px;
+          margin-bottom: 15px;
+        }
+        p {
+          margin-bottom: 15px;
+          text-align: justify;
+        }
+        ul {
+          margin: 15px 0 15px 30px;
+        }
+        li {
+          margin-bottom: 10px;
+        }
+        .contact-box {
+          background: #f0f4f8;
+          border-left: 4px solid #2a5298;
+          padding: 20px;
+          margin: 30px 0;
+          border-radius: 5px;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 40px;
+          padding-top: 20px;
+          border-top: 2px solid #e0e0e0;
+          color: #666;
+          font-size: 0.9em;
+        }
+        .highlight {
+          background: #fff3cd;
+          padding: 2px 6px;
+          border-radius: 3px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>🏀 Privacy Policy</h1>
+        <p class="effective-date"><strong>Effective Date:</strong> October 23, 2025</p>
+        <p class="effective-date"><strong>Service:</strong> SJC GreenHawks Sports Chatbot on Facebook Messenger</p>
+
+        <h2>1. Introduction</h2>
+        <p>
+          Welcome to the Saint Joseph College (SJC) GreenHawks Sports Bot. We are committed to protecting your privacy 
+          and handling your personal information responsibly. This Privacy Policy explains how we collect, use, and 
+          protect your information when you interact with our chatbot on Facebook Messenger.
+        </p>
+
+        <h2>2. Information We Collect</h2>
+        <p>When you interact with the SJC Sports Bot, we collect the following information:</p>
+        <ul>
+          <li><strong>Facebook User ID:</strong> A unique identifier provided by Facebook to enable us to respond to your messages</li>
+          <li><strong>Message Content:</strong> The text messages you send to our bot</li>
+          <li><strong>Language Preference:</strong> Automatically detected based on your message to provide responses in your language</li>
+          <li><strong>Interaction Timestamps:</strong> When you send messages (for session management only)</li>
+        </ul>
+        <p><span class="highlight">Note:</span> We do NOT collect your name, email address, phone number, or any other personal information beyond what Facebook Messenger provides for bot interactions.</p>
+
+        <h2>3. How We Use Your Information</h2>
+        <p>Your information is used exclusively for the following purposes:</p>
+        <ul>
+          <li>To respond to your inquiries about SJC sports programs, scholarships, and events</li>
+          <li>To provide information about team tryouts, training schedules, and merchandise</li>
+          <li>To detect your language and respond in your preferred language</li>
+          <li>To improve our chatbot's responses and user experience</li>
+          <li>To maintain conversation context during your current session</li>
+        </ul>
+
+        <h2>4. Data Storage and Retention</h2>
+        <p>
+          <strong>We do not permanently store your personal messages.</strong> Messages are processed in real-time 
+          through our AI system (Google Gemini) and are not retained in our database. Conversation data may be 
+          temporarily cached during your active session but is automatically deleted after the session ends.
+        </p>
+        <p>
+          Server logs containing anonymized interaction data (such as timestamps and response times) may be 
+          retained for up to 30 days for technical monitoring purposes only.
+        </p>
+
+        <h2>5. Third-Party Services</h2>
+        <p>Our chatbot uses the following third-party services:</p>
+        <ul>
+          <li>
+            <strong>Facebook Messenger Platform:</strong> For message delivery and receiving messages. 
+            Facebook's privacy policy applies: <a href="https://www.facebook.com/privacy/explanation" target="_blank">facebook.com/privacy</a>
+          </li>
+          <li>
+            <strong>Google Gemini AI:</strong> For generating intelligent responses to your questions. 
+            Your messages are processed by Google's AI but are not used to train their models or stored permanently. 
+            Google's privacy policy: <a href="https://policies.google.com/privacy" target="_blank">policies.google.com/privacy</a>
+          </li>
+          <li>
+            <strong>Render.com:</strong> Cloud hosting service for our bot infrastructure. 
+            Privacy policy: <a href="https://render.com/privacy" target="_blank">render.com/privacy</a>
+          </li>
+        </ul>
+
+        <h2>6. Data Sharing and Disclosure</h2>
+        <p>
+          <strong>We do NOT sell, trade, rent, or share your personal information with third parties</strong> for 
+          marketing purposes. Your information may only be disclosed in the following limited circumstances:
+        </p>
+        <ul>
+          <li><strong>With Your Consent:</strong> If you explicitly request us to share information</li>
+          <li><strong>Legal Requirements:</strong> If required by law, court order, or government regulation</li>
+          <li><strong>Service Providers:</strong> Only to the extent necessary for the third-party services mentioned above to function</li>
+        </ul>
+
+        <h2>7. Your Rights and Choices</h2>
+        <p>You have the following rights regarding your data:</p>
+        <ul>
+          <li><strong>Stop Using the Service:</strong> You can stop using the bot at any time by not sending messages</li>
+          <li><strong>Delete Conversation:</strong> You can delete your conversation history on Facebook Messenger</li>
+          <li><strong>Request Data Deletion:</strong> Contact us to request deletion of any stored data</li>
+          <li><strong>Access Your Information:</strong> Request information about what data we have about you</li>
+          <li><strong>Opt-Out:</strong> Block or report the bot on Facebook Messenger to stop all interactions</li>
+        </ul>
+
+        <h2>8. Children's Privacy</h2>
+        <p>
+          Our service is intended for users <strong>13 years of age and older</strong>, in compliance with Facebook's 
+          Terms of Service and the Children's Online Privacy Protection Act (COPPA). We do not knowingly collect 
+          information from children under 13. If we become aware that we have collected data from a child under 13, 
+          we will take immediate steps to delete that information.
+        </p>
+
+        <h2>9. Data Security</h2>
+        <p>
+          We implement reasonable security measures to protect your information from unauthorized access, alteration, 
+          disclosure, or destruction. These include:
+        </p>
+        <ul>
+          <li>Secure HTTPS/SSL encryption for all data transmission</li>
+          <li>Access controls and authentication for our systems</li>
+          <li>Regular security monitoring and updates</li>
+          <li>Minimal data retention policies</li>
+        </ul>
+        <p>
+          However, no method of transmission over the internet is 100% secure. While we strive to protect your 
+          information, we cannot guarantee absolute security.
+        </p>
+
+        <h2>10. International Users</h2>
+        <p>
+          Our service is primarily intended for users in the Philippines. However, we support multiple languages 
+          and welcome international users. By using our service, you consent to the transfer and processing of 
+          your information in the Philippines and the United States (where our hosting and AI services are located).
+        </p>
+
+        <h2>11. Changes to This Privacy Policy</h2>
+        <p>
+          We may update this Privacy Policy from time to time to reflect changes in our practices or for legal, 
+          operational, or regulatory reasons. When we make changes, we will:
+        </p>
+        <ul>
+          <li>Update the "Effective Date" at the top of this policy</li>
+          <li>Post the updated policy at this URL</li>
+          <li>Notify users through the chatbot if changes are significant</li>
+        </ul>
+        <p>We encourage you to review this policy periodically.</p>
+
+        <h2>12. Contact Us</h2>
+        <div class="contact-box">
+          <p><strong>For questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact:</strong></p>
+          <p style="margin-top: 15px;">
+            <strong>Saint Joseph College - Sports Development Office</strong><br>
+            📧 Email: <a href="mailto:sjcdo@gmail.com">sjcdo@gmail.com</a><br>
+            📍 Location: Tungka-tunga, Maasin City, Southern Leyte, Philippines<br>
+            💬 Facebook: <a href="https://www.facebook.com/people/SJC-Sports-Chat/61582368223061/" target="_blank">SJC Sports Chat</a>
+          </p>
+          <p style="margin-top: 15px;">
+            <strong>Response Time:</strong> We will respond to privacy-related inquiries within 5-7 business days.
+          </p>
+        </div>
+
+        <h2>13. Consent</h2>
+        <p>
+          By using the SJC Sports Bot on Facebook Messenger, you acknowledge that you have read, understood, and 
+          agree to the terms of this Privacy Policy. If you do not agree with this policy, please do not use our service.
+        </p>
+
+        <div class="footer">
+          <p><strong>© 2025 Saint Joseph College - Sports Development Office</strong></p>
+          <p>All rights reserved.</p>
+          <p style="margin-top: 10px;">
+            🏀 Go GreenHawks! 🦅
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// Terms of Service route (optional but recommended)
+app.get('/terms', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Terms of Service - SJC Sports Bot</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: 'Segoe UI', Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+          padding: 20px;
+          min-height: 100vh;
+        }
+        .container {
+          max-width: 900px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 15px;
+          padding: 40px;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+          color: #1e3c72;
+          font-size: 2.5em;
+          margin-bottom: 10px;
+          border-bottom: 3px solid #2a5298;
+          padding-bottom: 15px;
+        }
+        h2 {
+          color: #2a5298;
+          font-size: 1.5em;
+          margin-top: 30px;
+          margin-bottom: 15px;
+        }
+        p { margin-bottom: 15px; }
+        ul { margin: 15px 0 15px 30px; }
+        li { margin-bottom: 10px; }
+        .footer {
+          text-align: center;
+          margin-top: 40px;
+          padding-top: 20px;
+          border-top: 2px solid #e0e0e0;
+          color: #666;
+          font-size: 0.9em;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>🏀 Terms of Service</h1>
+        <p><strong>Effective Date:</strong> October 23, 2025</p>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>
+          By using the SJC GreenHawks Sports Bot, you agree to these Terms of Service. 
+          If you do not agree, please do not use the service.
+        </p>
+
+        <h2>2. Service Description</h2>
+        <p>
+          The SJC Sports Bot is an AI-powered chatbot that provides information about:
+        </p>
+        <ul>
+          <li>Sports programs and teams at Saint Joseph College</li>
+          <li>Varsity scholarships and application processes</li>
+          <li>Training schedules and tryout information</li>
+          <li>Sports merchandise and events</li>
+        </ul>
+
+        <h2>3. User Responsibilities</h2>
+        <p>You agree to:</p>
+        <ul>
+          <li>Provide accurate information when requesting assistance</li>
+          <li>Use the service for its intended purpose only</li>
+          <li>Not attempt to hack, abuse, or disrupt the service</li>
+          <li>Comply with Facebook's Terms of Service</li>
+        </ul>
+
+        <h2>4. Disclaimer</h2>
+        <p>
+          The information provided by the bot is for general guidance only. For official 
+          information regarding scholarships, enrollment, and policies, please contact 
+          the Sports Development Office directly at sjcdo@gmail.com.
+        </p>
+
+        <h2>5. Limitation of Liability</h2>
+        <p>
+          SJC and the Sports Development Office are not liable for any decisions made 
+          based on information provided by the chatbot. The service is provided "as is" 
+          without warranties of any kind.
+        </p>
+
+        <h2>6. Contact</h2>
+        <p>
+          <strong>Saint Joseph College - Sports Development Office</strong><br>
+          Email: sjcdo@gmail.com<br>
+          Location: Tungka-tunga, Maasin City, Southern Leyte, Philippines
+        </p>
+
+        <div class="footer">
+          <p><strong>© 2025 Saint Joseph College</strong></p>
+          <p>🏀 Go GreenHawks! 🦅</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log('\n' + '='.repeat(70));
@@ -472,7 +823,9 @@ app.listen(PORT, () => {
   console.log('🌍 MULTILINGUAL AI - POWERED BY GEMINI 2.0 FLASH');
   console.log('='.repeat(70));
   console.log(`\n🚀 Server: http://localhost:${PORT}`);
-  console.log(`🔗 Webhook: /webhook\n`);
+  console.log(`🔗 Webhook: /webhook`);
+  console.log(`📄 Privacy Policy: /privacy`);
+  console.log(`📜 Terms of Service: /terms\n`);
   console.log('📊 STATUS:');
   console.log('  ✓ VERIFY_TOKEN:', VERIFY_TOKEN);
   console.log('  ✓ PAGE_TOKEN:', PAGE_ACCESS_TOKEN ? `Valid (${PAGE_ACCESS_TOKEN.length} chars)` : 'MISSING');
