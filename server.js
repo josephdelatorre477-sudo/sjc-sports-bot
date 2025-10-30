@@ -1,4 +1,4 @@
-// server.js - SJC Sports Facebook Chatbot (FULLY FIXED & DEBUGGED)
+// server.js - SJC Sports Facebook Chatbot (ENHANCED MULTILINGUAL)
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
@@ -6,10 +6,10 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
-// Configuration - UPDATED TO MATCH YOUR ENVIRONMENT
-const VERIFY_TOKEN = process.env.VERIFY_TOKEN || '5% .spot\'s_200s_vest5y'; // Match your env exactly
+// Configuration
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN || '5% .spot\'s_200s_vest5y';
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.SENSUE_API_KEY; // Added fallback
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.SENSUE_API_KEY;
 const PORT = process.env.PORT || 3000;
 
 // Validate configuration
@@ -18,62 +18,166 @@ console.log('✓ VERIFY_TOKEN:', VERIFY_TOKEN ? 'SET' : 'MISSING');
 console.log('✓ PAGE_ACCESS_TOKEN:', PAGE_ACCESS_TOKEN ? `SET (${PAGE_ACCESS_TOKEN.length} chars)` : 'MISSING');
 console.log('✓ GEMINI_API_KEY:', GEMINI_API_KEY ? 'SET' : 'MISSING');
 
-// Using Gemini 2.0 Flash
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
-// Enhanced Business Context
+// Enhanced Business Context with Complete Information
 const BUSINESS_CONTEXT = `You are a friendly MULTILINGUAL assistant for Saint Joseph College (SJC) GreenHawks Sports Program in Maasin City, Philippines.
 
-KEY INFO:
-- Location: Tungka-tunga, Maasin City, Southern Leyte, Philippines
+OFFICE LOCATION:
+- Sports Development Office: Tunga-Tunga, Maasin City
+- At SJC Junior High School Department
+- Besides SJC Clinic
 - Email: sjcdo@gmail.com
-- Sports: Basketball, Volleyball, Badminton, Football, Table Tennis, Swimming
-- We offer varsity scholarships for qualified student-athletes
+- Facebook Page: https://www.facebook.com/profile.php?id=100094320444442
+
+SPORTS COORDINATORS:
+- Sir Dante Monter
+- Sir Jason S. Monter
+
+SPORTS OFFERED (17 Sports):
+Basketball, Volleyball, Arnis, Futsal, Sepak Takraw, Athletics, Football, Wushu, Table Tennis, Billiards, Taekwondo, Chess, Badminton, Boxing, Swimming, Dance Sports, Tennis
+
+FACILITIES:
+- SJC Fitness Gym (located at SJC Junior High School Department)
+
+SEASONAL SPORTS EVENTS:
+- Eastern Visayas Regional Athletic Association (EVRAA) Meet
+- State Colleges and Universities Athletic Association Eastern Visayas (SCUAA EV) Regional Meet
+- Palarong Pambansa
+- Batang Pinoy (Philippine Youth Games)
+- National PRISAA Games (Private Schools Athletic Association)
+- Regional PRISAA Meets
+
+PROGRAM DETAILS:
+- Varsity scholarships available for qualified student-athletes
 - Training: 2-3 hours, 4-5 times/week, late afternoon/evening
 - Medical clearance required before tryouts
-- Compete in PRISAA regional and national meets
+- Compete in regional and national competitions
 
 INSTRUCTIONS:
-1. ALWAYS respond in the SAME LANGUAGE the user writes in
-2. Keep responses SHORT (2-4 sentences)
-3. Be enthusiastic with sports emojis 🏀⚽🏐🦅
-4. If unsure, suggest contacting sjcdo@gmail.com
+1. ALWAYS respond in the EXACT SAME LANGUAGE the user writes in
+2. Keep responses SHORT (2-4 sentences maximum)
+3. Be enthusiastic with appropriate sports emojis 🏀⚽🏐🦅
+4. For announcements/updates, direct users to Facebook: https://www.facebook.com/profile.php?id=100094320444442
+5. If unsure, suggest visiting the office (beside SJC Clinic) or emailing sjcdo@gmail.com
 
-CRITICAL: Respond in user's language!`;
+CRITICAL: Match the user's language EXACTLY!`;
 
-// Language detection
+// Enhanced Language Detection with ALL Philippine Languages
 function detectLanguage(text) {
   const lower = text.toLowerCase();
   
-  // Filipino/Tagalog
-  if (lower.match(/(ako|ikaw|mo|ko|ba|po|hindi|oo|paano|ano|saan|gusto)/)) return 'Filipino';
-  // Cebuano/Bisaya  
-  if (lower.match(/(nako|nimo|dili|unsa|asa|gusto|og|kay)/)) return 'Cebuano';
-  // Spanish
-  if (lower.match(/(hola|gracias|sí|cómo|qué|dónde|quiero)/)) return 'Spanish';
-  // French
-  if (lower.match(/(bonjour|merci|oui|comment|quoi|où)/)) return 'French';
-  // German
-  if (lower.match(/(hallo|danke|ja|wie|was|wo)/)) return 'German';
-  // Chinese
-  if (text.match(/[\u4E00-\u9FFF]/)) return 'Chinese';
-  // Japanese
-  if (text.match(/[\u3040-\u309F\u30A0-\u30FF]/)) return 'Japanese';
-  // Korean
-  if (text.match(/[\uAC00-\uD7AF]/)) return 'Korean';
-  // Arabic
-  if (text.match(/[\u0600-\u06FF]/)) return 'Arabic';
-  // Russian
-  if (text.match(/[а-яА-ЯёЁ]/)) return 'Russian';
-  // Thai
-  if (text.match(/[\u0E00-\u0E7F]/)) return 'Thai';
-  // Hindi
-  if (text.match(/[\u0900-\u097F]/)) return 'Hindi';
+  // === PHILIPPINE LANGUAGES ===
   
+  // Tagalog/Filipino - Enhanced patterns
+  if (lower.match(/(^|\s)(ako|ikaw|mo|ko|ba|po|opo|hindi|oo|opo|paano|ano|saan|gusto|nais|kailangan|pwede|meron|wala|magkano|kailan|sino|bakit|nasaan|anong|alin|kanino|kaysa|lang|na|ng|ay|mga|naman|pala|din|rin|yung|yun|yan)(\s|$)/)) {
+    return 'Filipino';
+  }
+  
+  // Cebuano/Bisaya - Enhanced patterns
+  if (lower.match(/(^|\s)(nako|nimo|niya|nato|ninyo|nila|dili|wala|unsa|asa|kanus-a|kinsa|ngano|gusto|ganahan|kinahanglan|pwede|adto|ania|naa|tua|dinhi|diha|dira|kini|kana|kadto|og|ug|sa|ni|ang|si|ug|kay|nga)(\s|$)/)) {
+    return 'Cebuano';
+  }
+  
+  // Ilocano
+  if (lower.match(/(^|\s)(siak|sika|daytoy|diay|awan|adda|ania|sadino|kaano|sino|apay|kayat|kasapulan|mabalin|mapan|agturong|ditoy|sadiay|ket|ken|wenno|ngem|ta)(\s|$)/)) {
+    return 'Ilocano';
+  }
+  
+  // Hiligaynon/Ilonggo
+  if (lower.match(/(^|\s)(ako|ikaw|amon|inyo|ila|indi|wala|ano|diin|san-o|sin-o|ngaa|gusto|kinahanglan|pwede|kadto|diri|dira|ini|ina|sini|sina|kag|sang|sa|ang|kay)(\s|$)/)) {
+    return 'Hiligaynon';
+  }
+  
+  // Waray-Waray
+  if (lower.match(/(^|\s)(ako|ikaw|amon|iyo|ira|diri|waray|ano|hain|kanus-a|hin-o|ngain|gusto|kinahanglan|pwede|kadto|dinhi|didto|ini|iton|ngan|han|san|hin|nga)(\s|$)/)) {
+    return 'Waray-Waray';
+  }
+  
+  // Kapampangan
+  if (lower.match(/(^|\s)(aku|ika|ikami|ikayu|ila|ali|alang|nanu|nukarin|kailan|ninu|bakit|buri|kailangan|malyari|makapaunta|keni|karin|ini|ita|at|ning|king|kareng)(\s|$)/)) {
+    return 'Kapampangan';
+  }
+  
+  // Bicolano
+  if (lower.match(/(^|\s)(ako|ika|kami|kamo|sinda|dai|mayo|ano|sain|kailan|siisay|ta-ano|gusto|kaipotan|puwede|duman|digdi|diyan|ini|iyan|asin|sa|kan|nin)(\s|$)/)) {
+    return 'Bicolano';
+  }
+  
+  // Pangasinan
+  if (lower.match(/(^|\s)(siak|sika|sikami|sikayo|sikara|anggapo|anggapoy|anto|akin|kapigan|siopa|apon|kayari|kailangan|maong|ondadya|iyan|ditoy|diay|tan|ed|na|nen)(\s|$)/)) {
+    return 'Pangasinan';
+  }
+  
+  // Maranao
+  if (lower.match(/(^|\s)(ako|ikaw|kami|kamu|iran|diri|wara|onopa|dimano|kapiya|mano|apiya|giya|kailangan|masari|dito|diyan|ini|iyan|ago|so|ko|ko)(\s|$)/)) {
+    return 'Maranao';
+  }
+  
+  // Maguindanao
+  if (lower.match(/(^|\s)(aku|ikaw|kami|kamu|siran|diri|wara|nopa|dini|kapan|sinu|apiya|nu|kailangan|maari|ditu|diyan|ini|iyan|aw|sa|nu|den)(\s|$)/)) {
+    return 'Maguindanao';
+  }
+  
+  // === MAJOR WORLD LANGUAGES ===
+  
+  // Mandarin Chinese
+  if (text.match(/[\u4E00-\u9FFF]/)) {
+    return 'Chinese';
+  }
+  
+  // Hindi/Devanagari script
+  if (text.match(/[\u0900-\u097F]/)) {
+    return 'Hindi';
+  }
+  
+  // Spanish
+  if (lower.match(/(^|\s)(hola|gracias|sí|no|cómo|qué|dónde|cuándo|quién|por qué|quiero|necesito|puedo|buenos|días|noches|señor|señora)(\s|$|[?!.])/)) {
+    return 'Spanish';
+  }
+  
+  // French
+  if (lower.match(/(^|\s)(bonjour|merci|oui|non|comment|quoi|où|quand|qui|pourquoi|je|tu|nous|vous|ils|avec|pour|dans|sur)(\s|$)/)) {
+    return 'French';
+  }
+  
+  // === OTHER SCRIPTS ===
+  
+  // Japanese
+  if (text.match(/[\u3040-\u309F\u30A0-\u30FF]/)) {
+    return 'Japanese';
+  }
+  
+  // Korean
+  if (text.match(/[\uAC00-\uD7AF]/)) {
+    return 'Korean';
+  }
+  
+  // Arabic
+  if (text.match(/[\u0600-\u06FF]/)) {
+    return 'Arabic';
+  }
+  
+  // Russian/Cyrillic
+  if (text.match(/[а-яА-ЯёЁ]/)) {
+    return 'Russian';
+  }
+  
+  // Thai
+  if (text.match(/[\u0E00-\u0E7F]/)) {
+    return 'Thai';
+  }
+  
+  // German
+  if (lower.match(/(^|\s)(hallo|danke|ja|nein|wie|was|wo|wann|wer|warum|ich|du|wir|ihr|sie|mit|für|und|oder)(\s|$)/)) {
+    return 'German';
+  }
+  
+  // Default to English
   return 'English';
 }
 
-// Root route
+// Root route with updated language list
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -126,7 +230,7 @@ app.get('/', (req, res) => {
         }
         .languages {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
           gap: 10px;
           margin-top: 15px;
         }
@@ -135,14 +239,22 @@ app.get('/', (req, res) => {
           padding: 8px;
           border-radius: 5px;
           text-align: center;
-          font-size: 0.9em;
+          font-size: 0.85em;
+        }
+        .lang-category {
+          margin-top: 20px;
+        }
+        .lang-category h4 {
+          color: #ffeb3b;
+          margin-bottom: 10px;
+          font-size: 1.1em;
         }
       </style>
     </head>
     <body>
       <div class="container">
         <h1>🏀 SJC GreenHawks Sports Bot</h1>
-        <p style="font-size: 1.2em; margin: 10px 0;">🌍 Multilingual AI Chatbot - Powered by Google Gemini 2.0</p>
+        <p style="font-size: 1.2em; margin: 10px 0;">🌐 Multilingual AI Chatbot - Powered by Google Gemini 2.0</p>
         
         <div class="status">
           <div class="status-card ok">
@@ -164,9 +276,6 @@ app.get('/', (req, res) => {
                 ? '✓ Valid (' + PAGE_ACCESS_TOKEN.length + ' chars)'
                 : '✗ Missing or Invalid'}
             </div>
-            ${PAGE_ACCESS_TOKEN && PAGE_ACCESS_TOKEN.length > 100 
-              ? '<div style="margin-top:10px; font-size:0.8em; opacity:0.7;">First 40: ' + PAGE_ACCESS_TOKEN.substring(0, 40) + '...</div>'
-              : ''}
           </div>
           
           <div class="status-card ${GEMINI_API_KEY && GEMINI_API_KEY !== 'undefined' ? 'ok' : 'warning'}">
@@ -180,39 +289,90 @@ app.get('/', (req, res) => {
         </div>
 
         <div class="info-box">
-          <h3>📋 Webhook Configuration</h3>
-          <p style="margin: 10px 0;"><strong>Callback URL:</strong> https://sjc-sports-bot.onrender.com/webhook</p>
-          <p style="margin: 10px 0;"><strong>Verify Token:</strong> ${VERIFY_TOKEN}</p>
-          <p style="margin: 10px 0;"><strong>Events:</strong> messages, messaging_postbacks</p>
-          <p style="margin: 10px 0; color: #ffeb3b;"><strong>⚠ IMPORTANT:</strong> Use EXACTLY this verify token in Facebook Developer settings</p>
-        </div>
-
-        <div class="info-box">
-          <h3>🌍 Supported Languages</h3>
-          <div class="languages">
-            <div class="lang-tag">🇬🇧 English</div>
-            <div class="lang-tag">🇵🇭 Filipino</div>
-            <div class="lang-tag">🇵🇭 Cebuano</div>
-            <div class="lang-tag">🇪🇸 Spanish</div>
-            <div class="lang-tag">🇫🇷 French</div>
-            <div class="lang-tag">🇩🇪 German</div>
-            <div class="lang-tag">🇮🇹 Italian</div>
-            <div class="lang-tag">🇵🇹 Portuguese</div>
-            <div class="lang-tag">🇨🇳 Chinese</div>
-            <div class="lang-tag">🇯🇵 Japanese</div>
-            <div class="lang-tag">🇰🇷 Korean</div>
-            <div class="lang-tag">🇷🇺 Russian</div>
-            <div class="lang-tag">🇸🇦 Arabic</div>
-            <div class="lang-tag">🇮🇳 Hindi</div>
-            <div class="lang-tag">🇹🇭 Thai</div>
-            <div class="lang-tag">+ More</div>
+          <h3>🌐 Supported Languages (15 Total)</h3>
+          
+          <div class="lang-category">
+            <h4>🌍 Major World Languages (5)</h4>
+            <div class="languages">
+              <div class="lang-tag">🇬🇧 English</div>
+              <div class="lang-tag">🇨🇳 Mandarin Chinese</div>
+              <div class="lang-tag">🇮🇳 Hindi</div>
+              <div class="lang-tag">🇪🇸 Spanish</div>
+              <div class="lang-tag">🇫🇷 French</div>
+            </div>
+          </div>
+          
+          <div class="lang-category">
+            <h4>🇵🇭 Philippine Languages (10)</h4>
+            <div class="languages">
+              <div class="lang-tag">🇵🇭 Tagalog (Filipino)</div>
+              <div class="lang-tag">🇵🇭 Cebuano (Bisaya)</div>
+              <div class="lang-tag">🇵🇭 Ilocano</div>
+              <div class="lang-tag">🇵🇭 Hiligaynon (Ilonggo)</div>
+              <div class="lang-tag">🇵🇭 Waray-Waray</div>
+              <div class="lang-tag">🇵🇭 Kapampangan</div>
+              <div class="lang-tag">🇵🇭 Bicolano</div>
+              <div class="lang-tag">🇵🇭 Pangasinan</div>
+              <div class="lang-tag">🇵🇭 Maranao</div>
+              <div class="lang-tag">🇵🇭 Maguindanao</div>
+            </div>
           </div>
         </div>
 
         <div class="info-box">
+          <h3>📋 Webhook Configuration</h3>
+          <p style="margin: 10px 0;"><strong>Callback URL:</strong> https://sjc-sports-bot.onrender.com/webhook</p>
+          <p style="margin: 10px 0;"><strong>Verify Token:</strong> ${VERIFY_TOKEN}</p>
+          <p style="margin: 10px 0;"><strong>Events:</strong> messages, messaging_postbacks</p>
+        </div>
+
+        <div class="info-box">
           <h3>📧 Contact Information</h3>
-          <p>Email: sjcdo@gmail.com</p>
-          <p>Facebook Page: SJC Sports Chat</p>
+          <p><strong>Sports Development Office:</strong></p>
+          <p>📍 Tunga-Tunga, Maasin City</p>
+          <p>🏫 SJC Junior High School Department (Beside SJC Clinic)</p>
+          <p>📧 Email: sjcdo@gmail.com</p>
+          <p>📱 Facebook: <a href="https://www.facebook.com/profile.php?id=100094320444442" target="_blank">SJC Sports Page</a></p>
+          <p style="margin-top: 15px;"><strong>Sports Coordinators:</strong></p>
+          <p>👨‍🏫 Sir Dante Monter</p>
+          <p>👨‍🏫 Sir Jason S. Monter</p>
+          <p style="margin-top: 15px;"><strong>Fitness Facility:</strong></p>
+          <p>💪 SJC Fitness Gym (at SJC Junior High School Department)</p>
+        </div>
+
+        <div class="info-box">
+          <h3>🏆 Sports Offered (17 Total)</h3>
+          <div class="languages">
+            <div class="lang-tag">🏀 Basketball</div>
+            <div class="lang-tag">🏐 Volleyball</div>
+            <div class="lang-tag">🥋 Arnis</div>
+            <div class="lang-tag">⚽ Futsal</div>
+            <div class="lang-tag">🏸 Sepak Takraw</div>
+            <div class="lang-tag">🏃 Athletics</div>
+            <div class="lang-tag">⚽ Football</div>
+            <div class="lang-tag">🥋 Wushu</div>
+            <div class="lang-tag">🏓 Table Tennis</div>
+            <div class="lang-tag">🎱 Billiards</div>
+            <div class="lang-tag">🥋 Taekwondo</div>
+            <div class="lang-tag">♟️ Chess</div>
+            <div class="lang-tag">🏸 Badminton</div>
+            <div class="lang-tag">🥊 Boxing</div>
+            <div class="lang-tag">🏊 Swimming</div>
+            <div class="lang-tag">💃 Dance Sports</div>
+            <div class="lang-tag">🎾 Tennis</div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <h3>🏅 Seasonal Sports Events</h3>
+          <ul style="margin-left: 20px; margin-top: 10px;">
+            <li>Eastern Visayas Regional Athletic Association (EVRAA) Meet</li>
+            <li>State Colleges and Universities Athletic Association Eastern Visayas (SCUAA EV) Regional Meet</li>
+            <li>Palarong Pambansa</li>
+            <li>Batang Pinoy - Philippine Youth Games</li>
+            <li>National PRISAA Games (Private Schools Athletic Association)</li>
+            <li>Regional PRISAA Meets</li>
+          </ul>
         </div>
       </div>
     </body>
@@ -220,7 +380,7 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Webhook verification (GET) - ENHANCED DEBUGGING
+// Webhook verification (GET)
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -230,78 +390,77 @@ app.get('/webhook', (req, res) => {
   console.log('Mode:', mode);
   console.log('Token Received:', token);
   console.log('Token Expected:', VERIFY_TOKEN);
-  console.log('Challenge:', challenge);
 
   if (mode === 'subscribe' && token === VERIFY_TOKEN) {
     console.log('✅ WEBHOOK VERIFIED SUCCESSFULLY!');
     res.status(200).send(challenge);
   } else {
     console.log('❌ WEBHOOK VERIFICATION FAILED');
-    console.log('Reason:', mode !== 'subscribe' ? 'Wrong mode' : 'Token mismatch');
     res.sendStatus(403);
   }
 });
 
-// Webhook events (POST) - ENHANCED LOGGING
+// Webhook events (POST)
 app.post('/webhook', (req, res) => {
   console.log('\n📬 WEBHOOK EVENT RECEIVED:', new Date().toISOString());
   
   const body = req.body;
 
   if (body.object === 'page') {
-    console.log('📄 Page event received');
-    
-    body.entry?.forEach((entry, index) => {
-      console.log(`📦 Entry ${index}:`, entry.id);
-      
-      entry.messaging?.forEach((event, eventIndex) => {
-        console.log(`\n🎯 Event ${eventIndex}:`);
-        console.log('   Sender:', event.sender?.id);
-        
+    body.entry?.forEach((entry) => {
+      entry.messaging?.forEach((event) => {
         if (event.message?.text) {
-          console.log('   💬 Message:', event.message.text);
+          console.log('💬 Message:', event.message.text);
           handleMessage(event.sender.id, event.message.text);
         } else if (event.postback) {
-          console.log('   🔘 Postback:', event.postback.payload);
+          console.log('📘 Postback:', event.postback.payload);
           handlePostback(event.sender.id, event.postback.payload);
-        } else {
-          console.log('   📋 Other event type:', Object.keys(event).join(', '));
         }
       });
     });
     
     res.status(200).send('EVENT_RECEIVED');
   } else {
-    console.log('❌ Invalid object type:', body.object);
     res.sendStatus(404);
   }
 });
 
 // Message handler
 async function handleMessage(senderId, messageText) {
-  console.log(`\n🔄 PROCESSING MESSAGE FROM ${senderId}`);
-  console.log(`📝 Text: "${messageText}"`);
+  console.log(`\n📝 PROCESSING MESSAGE FROM ${senderId}`);
+  console.log(`📄 Text: "${messageText}"`);
 
-  // Validate token
   if (!PAGE_ACCESS_TOKEN || PAGE_ACCESS_TOKEN.length < 100) {
     console.error('❌ CANNOT RESPOND: Invalid PAGE_ACCESS_TOKEN');
     return;
   }
 
   const detectedLanguage = detectLanguage(messageText);
-  console.log(`🌍 Language: ${detectedLanguage}`);
+  console.log(`🌐 Detected Language: ${detectedLanguage}`);
 
-  // Typing indicator
   sendTypingIndicator(senderId, true);
 
-  // Simple greeting check
+  // Enhanced greeting detection for all languages
   const lowerText = messageText.toLowerCase();
-  if (lowerText.match(/^(hi|hello|hey|kamusta|musta|asa|hola)$/i)) {
+  const greetingPatterns = /^(hi|hello|hey|kamusta|musta|kumusta|hola|bonjour|ola|你好|नमस्ते|maayong|adlaw|maupay|kumusta|ola)$/i;
+  
+  if (lowerText.match(greetingPatterns)) {
     const greetings = {
       'English': "Hey there! 👋 Welcome to SJC GreenHawks Sports! I'm your AI assistant. How can I help you today? 🏀",
       'Filipino': "Kamusta! 👋 Welcome sa SJC GreenHawks Sports! Ako ang iyong AI assistant. Paano kita matutulungan? 🏀",
       'Cebuano': "Kumusta! 👋 Welcome sa SJC GreenHawks Sports! Ako ang imong AI assistant. Unsaon nako pagtabang? 🏀",
-      'Spanish': "¡Hola! 👋 ¡Bienvenido a SJC GreenHawks Sports! Soy tu asistente de IA. ¿Cómo puedo ayudarte? 🏀"
+      'Ilocano': "Kumusta! 👋 Welcome iti SJC GreenHawks Sports! Siak ti AI assistant mo. Kasano nga makatulongak kenka? 🏀",
+      'Hiligaynon': "Kamusta! 👋 Welcome sa SJC GreenHawks Sports! Ako ang imo AI assistant. Paano ko makabulig sa imo? 🏀",
+      'Waray-Waray': "Maupay! 👋 Welcome ha SJC GreenHawks Sports! Ako an imo AI assistant. Paano ko makabubulig ha imo? 🏀",
+      'Kapampangan': "Kumusta! 👋 Welcome king SJC GreenHawks Sports! Aku ing AI assistant mu. Makasanmetung daka ku? 🏀",
+      'Bicolano': "Kumusta! 👋 Welcome sa SJC GreenHawks Sports! Ako an saimong AI assistant. Paano ko matatabangan ka? 🏀",
+      'Pangasinan': "Kumusta! 👋 Welcome ed SJC GreenHawks Sports! Siakoy AI assistant mo. Paano ko makabiang na sika? 🏀",
+      'Maranao': "Kapiya sa tao! 👋 Welcome sa SJC GreenHawks Sports! Ako a AI assistant mo. Onopa ko tabangan ka? 🏀",
+      'Maguindanao': "Ampiya sa tao! 👋 Welcome sa SJC GreenHawks Sports! Aku nu AI assistant nu. Nopa ku tabangan ka? 🏀",
+      'Spanish': "¡Hola! 👋 ¡Bienvenido a SJC GreenHawks Sports! Soy tu asistente de IA. ¿Cómo puedo ayudarte? 🏀",
+      'Chinese': "你好！👋 欢迎来到SJC GreenHawks体育！我是你的AI助手。我能帮你什么？🏀",
+      'Hindi': "नमस्ते! 👋 SJC GreenHawks Sports में आपका स्वागत है! मैं आपका AI सहायक हूं। मैं आपकी कैसे मदद कर सकता हूं? 🏀",
+      'French': "Bonjour! 👋 Bienvenue à SJC GreenHawks Sports! Je suis votre assistant IA. Comment puis-je vous aider? 🏀"
     };
     sendQuickReply(senderId, greetings[detectedLanguage] || greetings['English'], detectedLanguage);
     return;
@@ -312,7 +471,7 @@ async function handleMessage(senderId, messageText) {
     try {
       console.log('🤖 Calling Gemini AI...');
       const aiResponse = await getGeminiResponse(messageText, detectedLanguage);
-      console.log('✅ AI Response:', aiResponse.substring(0, 80) + '...');
+      console.log('✅ AI Response generated');
       sendQuickReply(senderId, aiResponse, detectedLanguage);
       return;
     } catch (error) {
@@ -322,13 +481,13 @@ async function handleMessage(senderId, messageText) {
 
   // Fallback
   const fallback = getFallbackResponse(detectedLanguage, lowerText);
-  console.log('📋 Fallback response');
+  console.log('📋 Using fallback response');
   sendQuickReply(senderId, fallback, detectedLanguage);
 }
 
-// Gemini AI call
+// Gemini AI call with enhanced language support
 async function getGeminiResponse(userMessage, language) {
-  const prompt = `${BUSINESS_CONTEXT}\n\nIMPORTANT: User wrote in ${language}. Respond ONLY in ${language}.\n\nUser: "${userMessage}"\n\nYour response (in ${language}, 2-4 sentences):`;
+  const prompt = `${BUSINESS_CONTEXT}\n\nCRITICAL INSTRUCTION: The user wrote their message in ${language}. You MUST respond ONLY in ${language}. Do not use any other language.\n\nUser message: "${userMessage}"\n\nYour response (in ${language}, keep it 2-4 sentences):`;
 
   try {
     const response = await axios.post(
@@ -354,48 +513,143 @@ async function getGeminiResponse(userMessage, language) {
   }
 }
 
-// Fallback responses
+// Enhanced fallback responses for all languages
 function getFallbackResponse(language, queryLower) {
-  // FAQ matching
-  if (queryLower.includes('scholar') || queryLower.includes('beasiswa')) {
+  // Sports inquiries
+  if (queryLower.match(/(sports|laro|isport|deporte|sport|what sports|ano ang sports|unsa nga sports)/)) {
     const responses = {
-      'English': "🎓 Visit our Sports Development Office to inquire about varsity scholarships! Requirements will be discussed during screening. Contact: sjcdo@gmail.com",
-      'Filipino': "🎓 Bisitahin ang Sports Development Office para sa scholarship! Mga requirements ay tatalakayin sa screening. Contact: sjcdo@gmail.com",
-      'Cebuano': "🎓 Bisitaha ang Sports Development Office para sa scholarship! Mga requirements i-discuss sa screening. Contact: sjcdo@gmail.com"
+      'English': "🏆 SJC offers 17 sports: Basketball, Volleyball, Arnis, Futsal, Sepak Takraw, Athletics, Football, Wushu, Table Tennis, Billiards, Taekwondo, Chess, Badminton, Boxing, Swimming, Dance Sports, and Tennis! Which one interests you? 🦅",
+      'Filipino': "🏆 Nag-aalok ang SJC ng 17 sports: Basketball, Volleyball, Arnis, Futsal, Sepak Takraw, Athletics, Football, Wushu, Table Tennis, Billiards, Taekwondo, Chess, Badminton, Boxing, Swimming, Dance Sports, at Tennis! Alin ang gusto mo? 🦅",
+      'Cebuano': "🏆 Nag-offer ang SJC ug 17 ka sports: Basketball, Volleyball, Arnis, Futsal, Sepak Takraw, Athletics, Football, Wushu, Table Tennis, Billiards, Taekwondo, Chess, Badminton, Boxing, Swimming, Dance Sports, ug Tennis! Unsa ang gusto nimo? 🦅",
+      'Spanish': "🏆 ¡SJC ofrece 17 deportes: Baloncesto, Voleibol, Arnis, Futsal, Sepak Takraw, Atletismo, Fútbol, Wushu, Tenis de Mesa, Billar, Taekwondo, Ajedrez, Bádminton, Boxeo, Natación, Baile Deportivo y Tenis! ¿Cuál te interesa? 🦅"
     };
     return responses[language] || responses['English'];
   }
 
-  if (queryLower.includes('join') || queryLower.includes('sumali') || queryLower.includes('apil')) {
+  // Location/Office inquiries
+  if (queryLower.match(/(where|location|saan|asa|diin|office|opisina|lugar)/)) {
     const responses = {
-      'English': "🏃 Want to join our team? Visit the Sports Office for tryout schedules! Selection is based on performance and commitment. Let's go GreenHawks! 🦅",
-      'Filipino': "🏃 Gusto sumali sa team? Bisitahin ang Sports Office para sa tryout schedule! Based sa performance at commitment ang selection. Go GreenHawks! 🦅",
-      'Cebuano': "🏃 Gusto mo-apil sa team? Bisitaha ang Sports Office para sa tryout schedule! Based sa performance ug commitment ang selection. Go GreenHawks! 🦅"
+      'English': "📍 Sports Development Office is at SJC Junior High School Department, Tunga-Tunga, Maasin City - beside SJC Clinic! Visit us or contact Sir Dante Monter or Sir Jason S. Monter! 🏫",
+      'Filipino': "📍 Ang Sports Development Office ay nasa SJC Junior High School Department, Tunga-Tunga, Maasin City - tabi ng SJC Clinic! Bisitahin kami o kontakin sina Sir Dante Monter o Sir Jason S. Monter! 🏫",
+      'Cebuano': "📍 Ang Sports Development Office naa sa SJC Junior High School Department, Tunga-Tunga, Maasin City - tupad sa SJC Clinic! Bisitaha mi o kontaka si Sir Dante Monter o Sir Jason S. Monter! 🏫",
+      'Spanish': "📍 ¡La Oficina de Desarrollo Deportivo está en el Departamento de Secundaria de SJC, Tunga-Tunga, Maasin City - al lado de la Clínica SJC! ¡Visítanos o contacta a Sir Dante Monter o Sir Jason S. Monter! 🏫"
     };
     return responses[language] || responses['English'];
   }
 
-  // Default response
+  // Gym inquiries
+  if (queryLower.match(/(gym|fitness|workout|exercise|training facility|pahugasan)/)) {
+    const responses = {
+      'English': "💪 Visit SJC Fitness Gym at SJC Junior High School Department! Perfect for strength training and conditioning. Contact the Sports Office for access! 🏋️",
+      'Filipino': "💪 Bisitahin ang SJC Fitness Gym sa SJC Junior High School Department! Perfect para sa strength training at conditioning. Kontakin ang Sports Office para sa access! 🏋️",
+      'Cebuano': "💪 Bisitaha ang SJC Fitness Gym sa SJC Junior High School Department! Perfect para sa strength training ug conditioning. Kontaka ang Sports Office para sa access! 🏋️",
+      'Spanish': "💪 ¡Visita el SJC Fitness Gym en el Departamento de Secundaria de SJC! Perfecto para entrenamiento de fuerza y acondicionamiento. ¡Contacta la Oficina de Deportes para acceso! 🏋️"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  // Events/Competition inquiries
+  if (queryLower.match(/(event|competition|meet|tournament|palaro|kompetisyon|laban|games)/)) {
+    const responses = {
+      'English': "🏅 SJC competes in major events: EVRAA, SCUAA EV, Palarong Pambansa, Batang Pinoy, National PRISAA Games & Regional PRISAA! Follow SJC Sports page for schedules! 📅",
+      'Filipino': "🏅 Lumalaban ang SJC sa major events: EVRAA, SCUAA EV, Palarong Pambansa, Batang Pinoy, National PRISAA Games at Regional PRISAA! I-follow ang SJC Sports page para sa schedules! 📅",
+      'Cebuano': "🏅 Nakig-kompetensya ang SJC sa major events: EVRAA, SCUAA EV, Palarong Pambansa, Batang Pinoy, National PRISAA Games ug Regional PRISAA! I-follow ang SJC Sports page para sa schedules! 📅",
+      'Spanish': "🏅 ¡SJC compite en eventos importantes: EVRAA, SCUAA EV, Palarong Pambansa, Batang Pinoy, Juegos PRISAA Nacionales y PRISAA Regionales! ¡Sigue la página de SJC Sports para horarios! 📅"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  // Coordinator inquiries
+  if (queryLower.match(/(coordinator|coach|sir|teacher|guro|maestro|coordinator|sino ang)/)) {
+    const responses = {
+      'English': "👨‍🏫 Our Sports Coordinators are Sir Dante Monter and Sir Jason S. Monter! You can visit them at the Sports Development Office beside SJC Clinic! 🦅",
+      'Filipino': "👨‍🏫 Ang aming Sports Coordinators ay sina Sir Dante Monter at Sir Jason S. Monter! Bisitahin sila sa Sports Development Office tabi ng SJC Clinic! 🦅",
+      'Cebuano': "👨‍🏫 Ang among Sports Coordinators mao sila si Sir Dante Monter ug Sir Jason S. Monter! Bisitaha sila sa Sports Development Office tupad sa SJC Clinic! 🦅",
+      'Spanish': "👨‍🏫 ¡Nuestros Coordinadores Deportivos son Sir Dante Monter y Sir Jason S. Monter! ¡Puedes visitarlos en la Oficina de Desarrollo Deportivo al lado de la Clínica SJC! 🦅"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  // Facebook page inquiries
+  if (queryLower.match(/(facebook|fb|page|social media|announcement|update|balita)/)) {
+    const responses = {
+      'English': "📱 Follow SJC Sports on Facebook for announcements and updates! 👉 https://www.facebook.com/profile.php?id=100094320444442 Stay updated with tryouts, events, and achievements! 🦅",
+      'Filipino': "📱 I-follow ang SJC Sports sa Facebook para sa announcements at updates! 👉 https://www.facebook.com/profile.php?id=100094320444442 Manatiling updated sa tryouts, events, at achievements! 🦅",
+      'Cebuano': "📱 I-follow ang SJC Sports sa Facebook para sa mga announcements ug updates! 👉 https://www.facebook.com/profile.php?id=100094320444442 Magpabilin nga updated sa tryouts, events, ug achievements! 🦅",
+      'Spanish': "📱 ¡Sigue SJC Sports en Facebook para anuncios y actualizaciones! 👉 https://www.facebook.com/profile.php?id=100094320444442 ¡Mantente actualizado con pruebas, eventos y logros! 🦅"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  // Scholarship inquiries
+  if (queryLower.match(/(scholar|scholarship|beasiswa|iskolar|tuition|free)/)) {
+    const responses = {
+      'English': "🎓 Visit our Sports Development Office (beside SJC Clinic) to inquire about varsity scholarships! Contact Sir Dante Monter or Sir Jason S. Monter. Requirements discussed during screening. 📧 sjcdo@gmail.com",
+      'Filipino': "🎓 Bisitahin ang Sports Development Office (tabi ng SJC Clinic) para sa scholarship! Kontakin sina Sir Dante Monter o Sir Jason S. Monter. Mga requirements ay tatalakayin sa screening. 📧 sjcdo@gmail.com",
+      'Cebuano': "🎓 Bisitaha ang Sports Development Office (tupad sa SJC Clinic) para sa scholarship! Kontaka si Sir Dante Monter o Sir Jason S. Monter. Mga requirements i-discuss sa screening. 📧 sjcdo@gmail.com",
+      'Ilocano': "🎓 Sarungkaran ti Sports Development Office (abay ti SJC Clinic) para iti scholarship! Kontaken da Sir Dante Monter wenno Sir Jason S. Monter. Maipakaammo dagiti requirements iti screening. 📧 sjcdo@gmail.com",
+      'Hiligaynon': "🎓 Bisitaha ang Sports Development Office (kilid sang SJC Clinic) para sa scholarship! Kontaka si Sir Dante Monter ukon Sir Jason S. Monter. Ang mga requirements ipahayag sa screening. 📧 sjcdo@gmail.com",
+      'Waray-Waray': "🎓 Bisitaha an Sports Development Office (kilid han SJC Clinic) para han scholarship! Kontaka si Sir Dante Monter o Sir Jason S. Monter. An mga requirements makikiharap ha screening. 📧 sjcdo@gmail.com",
+      'Kapampangan': "🎓 Darapon me ing Sports Development Office (kasinglat ning SJC Clinic) para king scholarship! Kontaken yu si Sir Dante Monter o Sir Jason S. Monter. Deng requirements ipatalastas yu king screening. 📧 sjcdo@gmail.com",
+      'Bicolano': "🎓 Bisitahon an Sports Development Office (tabing kan SJC Clinic) para sa scholarship! Kontakton si Sir Dante Monter o Sir Jason S. Monter. An mga requirements ipahayag sa screening. 📧 sjcdo@gmail.com",
+      'Pangasinan': "🎓 Bisitaen yo so Sports Development Office (abay na SJC Clinic) para ed scholarship! Kontaken yo si Sir Dante Monter o Sir Jason S. Monter. Diad screening ipatalakad ray requirements. 📧 sjcdo@gmail.com",
+      'Spanish': "🎓 ¡Visita nuestra Oficina de Desarrollo Deportivo (al lado de la Clínica SJC) para preguntar sobre becas! Contacta a Sir Dante Monter o Sir Jason S. Monter. Los requisitos se discutirán en la evaluación. 📧 sjcdo@gmail.com",
+      'Chinese': "🎓 请访问我们的体育发展办公室（SJC诊所旁边）咨询体育奖学金！联系Dante Monter先生或Jason S. Monter先生。要求将在筛选时讨论。📧 sjcdo@gmail.com",
+      'Hindi': "🎓 छात्रवृत्ति के बारे में पूछताछ के लिए हमारे खेल विकास कार्यालय (SJC क्लिनिक के बगल में) पर जाएं! Sir Dante Monter या Sir Jason S. Monter से संपर्क करें। आवश्यकताओं पर स्क्रीनिंग में चर्चा की जाएगी।📧 sjcdo@gmail.com",
+      'French': "🎓 Visitez notre Bureau de développement sportif (à côté de la Clinique SJC) pour vous renseigner sur les bourses! Contactez Sir Dante Monter ou Sir Jason S. Monter. Les exigences seront discutées lors du dépistage. 📧 sjcdo@gmail.com"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  // Join team inquiries
+  if (queryLower.match(/(join|sumali|apil|tryout|team|entry|pasok)/)) {
+    const responses = {
+      'English': "🏃 Want to join our team? Visit the Sports Office (beside SJC Clinic) for tryout schedules! Talk to Sir Dante Monter or Sir Jason S. Monter. Selection based on performance and commitment. Go GreenHawks! 🦅",
+      'Filipino': "🏃 Gusto sumali sa team? Bisitahin ang Sports Office (tabi ng SJC Clinic) para sa tryout schedule! Makipag-usap kina Sir Dante Monter o Sir Jason S. Monter. Based sa performance at commitment ang selection. Go GreenHawks! 🦅",
+      'Cebuano': "🏃 Gusto mo-apil sa team? Bisitaha ang Sports Office (tupad sa SJC Clinic) para sa tryout schedule! Pakigsulti kang Sir Dante Monter o Sir Jason S. Monter. Based sa performance ug commitment ang selection. Go GreenHawks! 🦅",
+      'Ilocano': "🏃 Kayat mo nga sumali iti team? Sarungkaran ti Sports Office (abay ti SJC Clinic) para iti tryout schedule! Makisarita kada Sir Dante Monter wenno Sir Jason S. Monter. Batayan ti performance ken commitment ti selection. Go GreenHawks! 🦅",
+      'Hiligaynon': "🏃 Gusto mo mag-apil sa team? Bisitaha ang Sports Office (kilid sang SJC Clinic) para sa tryout schedule! Mag-istorya kay Sir Dante Monter ukon Sir Jason S. Monter. Base sa performance kag commitment ang selection. Go GreenHawks! 🦅",
+      'Waray-Waray': "🏃 Gusto mo magsangkot han team? Bisitaha an Sports Office (kilid han SJC Clinic) para han tryout schedule! Makig-istorya kan Sir Dante Monter o Sir Jason S. Monter. Base han performance ngan commitment an selection. Go GreenHawks! 🦅",
+      'Spanish': "🏃 ¿Quieres unirte a nuestro equipo? ¡Visita la Oficina de Deportes (al lado de la Clínica SJC) para conocer los horarios de prueba! Habla con Sir Dante Monter o Sir Jason S. Monter. La selección se basa en el rendimiento y el compromiso. ¡Vamos GreenHawks! 🦅",
+      'Chinese': "🏃 想加入我们的团队吗？访问体育办公室（SJC诊所旁边）了解试训时间！与Dante Monter先生或Jason S. Monter先生交谈。选拔基于表现和承诺。加油GreenHawks！🦅",
+      'Hindi': "🏃 हमारी टीम में शामिल होना चाहते हैं? ट्रायआउट शेड्यूल के लिए खेल कार्यालय (SJC क्लिनिक के बगल में) पर जाएं! Sir Dante Monter या Sir Jason S. Monter से बात करें। चयन प्रदर्शन और प्रतिबद्धता पर आधारित है। चलो GreenHawks! 🦅"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  // Default responses
   const defaults = {
     'English': "I'm here to help with SJC GreenHawks Sports! 🏀 Ask about scholarships, joining teams, training schedules, or contact sjcdo@gmail.com 📧",
     'Filipino': "Nandito ako para sa SJC GreenHawks Sports! 🏀 Tanungin ako tungkol sa scholarships, pagsali sa teams, training, o contact sjcdo@gmail.com 📧",
     'Cebuano': "Ania ko para sa SJC GreenHawks Sports! 🏀 Pangutana bahin sa scholarships, pag-apil sa teams, training, o contact sjcdo@gmail.com 📧",
+    'Ilocano': "Addaak ditoy para iti SJC GreenHawks Sports! 🏀 Damagek maipanggep iti scholarships, panagsilpo iti teams, training, wenno kontaken ti sjcdo@gmail.com 📧",
+    'Hiligaynon': "Ara ako diri para sa SJC GreenHawks Sports! 🏀 Pamangkuta parte sa scholarships, pag-apil sa teams, training, ukon contact ang sjcdo@gmail.com 📧",
+    'Waray-Waray': "Ania ako dinhi para han SJC GreenHawks Sports! 🏀 Pamangkot parte han scholarships, pagsangkot han teams, training, o contact an sjcdo@gmail.com 📧",
+    'Kapampangan': "Atyu ku keni para king SJC GreenHawks Sports! 🏀 Kutnan yu ku tungkol king scholarships, pamagdaklut kareng teams, training, o contact ing sjcdo@gmail.com 📧",
+    'Bicolano': "Yaon ako digdi para sa SJC GreenHawks Sports! 🏀 Hapot saako tungkol sa scholarships, pagsali sa teams, training, o contact si sjcdo@gmail.com 📧",
+    'Pangasinan': "Atateng ak diya para ed SJC GreenHawks Sports! 🏀 Iyeptan yoy manengneng ed scholarships, panggagawa ed teams, training, o contact so sjcdo@gmail.com 📧",
+    'Maranao': "Aya ako dini para sa SJC GreenHawks Sports! 🏀 Pangangkotanon ako tungkol sa scholarships, pagdakel sa teams, training, o contact so sjcdo@gmail.com 📧",
+    'Maguindanao': "Aya aku dini para sa SJC GreenHawks Sports! 🏀 Pangutana ka tungkul sa scholarships, pagsulud sa teams, training, o contact su sjcdo@gmail.com 📧",
     'Spanish': "¡Estoy aquí para SJC GreenHawks Sports! 🏀 Pregunta sobre becas, unirse a equipos, entrenamientos, o contacta sjcdo@gmail.com 📧",
     'French': "Je suis là pour SJC GreenHawks Sports! 🏀 Demandez des bourses, rejoindre équipes, entraînements, ou contactez sjcdo@gmail.com 📧",
     'Chinese': "我在这里帮助SJC GreenHawks体育！🏀 询问奖学金、加入团队、训练，或联系 sjcdo@gmail.com 📧",
     'Japanese': "SJC GreenHawksスポーツをサポートします！🏀 奨学金、チーム参加、トレーニングについて質問、または sjcdo@gmail.com へ 📧",
-    'Korean': "SJC GreenHawks 스포츠를 도와드립니다! 🏀 장학금, 팀 가입, 훈련에 대해 문의하거나 sjcdo@gmail.com로 연락하세요 📧"
+    'Korean': "SJC GreenHawks 스포츠를 도와드립니다! 🏀 장학금, 팀 가입, 훈련에 대해 문의하거나 sjcdo@gmail.com로 연락하세요 📧",
+    'Hindi': "मैं SJC GreenHawks Sports के लिए यहां हूं! 🏀 छात्रवृत्ति, टीमों में शामिल होने, प्रशिक्षण के बारे में पूछें, या sjcdo@gmail.com से संपर्क करें 📧",
+    'Arabic': "أنا هنا للمساعدة في SJC GreenHawks Sports! 🏀 اسأل عن المنح الدراسية أو الانضمام إلى الفرق أو التدريب أو اتصل بـ sjcdo@gmail.com 📧",
+    'Russian': "Я здесь, чтобы помочь с SJC GreenHawks Sports! 🏀 Спросите о стипендиях, присоединении к командам, тренировках или свяжитесь sjcdo@gmail.com 📧",
+    'Thai': "ฉันอยู่ที่นี่เพื่อช่วยเหลือ SJC GreenHawks Sports! 🏀 ถามเกี่ยวกับทุนการศึกษา การเข้าร่วมทีม การฝึกซ้อม หรือติดต่อ sjcdo@gmail.com 📧"
   };
 
   return defaults[language] || defaults['English'];
 }
 
-// Postback handler
+// Postback handler with multilingual support
 function handlePostback(senderId, payload) {
-  console.log(`🔘 Postback: ${payload}`);
+  console.log(`📘 Postback: ${payload}`);
   
   const responses = {
-    'GET_STARTED': "Welcome to SJC GreenHawks Sports! 🏀🦅 I speak all languages! How can I help you?",
+    'GET_STARTED': "Welcome to SJC GreenHawks Sports! 🏀🦅 I speak multiple languages! How can I help you?",
     'SHOW_FAQS': "Here's what I can help with! 👇 Ask about scholarships, joining teams, training, or merchandise!",
     'CONTACT_US': "📧 Email: sjcdo@gmail.com | Message me here anytime! I'm available 24/7! 😊"
   };
@@ -411,13 +665,24 @@ function sendTypingIndicator(recipientId, isTyping) {
   });
 }
 
-// Quick reply message
+// Quick reply message with multilingual buttons
 function sendQuickReply(recipientId, text, language) {
   const translations = {
     'English': { scholar: '🎓 Scholarship', join: '🏃 Join', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Contact' },
     'Filipino': { scholar: '🎓 Scholarship', join: '🏃 Sumali', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
     'Cebuano': { scholar: '🎓 Scholarship', join: '🏃 Apil', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
-    'Spanish': { scholar: '🎓 Beca', join: '🏃 Unirse', merch: '👕 Tienda', sports: '🏆 Deportes', train: '⏰ Entrenar', contact: '📧 Contacto' }
+    'Ilocano': { scholar: '🎓 Scholarship', join: '🏃 Sumali', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
+    'Hiligaynon': { scholar: '🎓 Scholarship', join: '🏃 Apil', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
+    'Waray-Waray': { scholar: '🎓 Scholarship', join: '🏃 Sangkot', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
+    'Kapampangan': { scholar: '🎓 Scholarship', join: '🏃 Daklut', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
+    'Bicolano': { scholar: '🎓 Scholarship', join: '🏃 Sali', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
+    'Pangasinan': { scholar: '🎓 Scholarship', join: '🏃 Gawaen', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
+    'Maranao': { scholar: '🎓 Scholarship', join: '🏃 Dakel', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
+    'Maguindanao': { scholar: '🎓 Scholarship', join: '🏃 Sulud', merch: '👕 Merch', sports: '🏆 Sports', train: '⏰ Training', contact: '📧 Kontak' },
+    'Spanish': { scholar: '🎓 Beca', join: '🏃 Unirse', merch: '👕 Tienda', sports: '🏆 Deportes', train: '⏰ Entrenar', contact: '📧 Contacto' },
+    'Chinese': { scholar: '🎓 奖学金', join: '🏃 加入', merch: '👕 商品', sports: '🏆 体育', train: '⏰ 训练', contact: '📧 联系' },
+    'Hindi': { scholar: '🎓 छात्रवृत्ति', join: '🏃 शामिल', merch: '👕 सामान', sports: '🏆 खेल', train: '⏰ प्रशिक्षण', contact: '📧 संपर्क' },
+    'French': { scholar: '🎓 Bourse', join: '🏃 Rejoindre', merch: '👕 Boutique', sports: '🏆 Sports', train: '⏰ Entraîner', contact: '📧 Contact' }
   };
 
   const t = translations[language] || translations['English'];
@@ -546,165 +811,51 @@ app.get('/privacy', (req, res) => {
           color: #666;
           font-size: 0.9em;
         }
-        .highlight {
-          background: #fff3cd;
-          padding: 2px 6px;
-          border-radius: 3px;
-        }
       </style>
     </head>
     <body>
       <div class="container">
         <h1>🏀 Privacy Policy</h1>
-        <p class="effective-date"><strong>Effective Date:</strong> October 23, 2025</p>
+        <p class="effective-date"><strong>Effective Date:</strong> October 31, 2025</p>
         <p class="effective-date"><strong>Service:</strong> SJC GreenHawks Sports Chatbot on Facebook Messenger</p>
 
         <h2>1. Introduction</h2>
         <p>
           Welcome to the Saint Joseph College (SJC) GreenHawks Sports Bot. We are committed to protecting your privacy 
-          and handling your personal information responsibly. This Privacy Policy explains how we collect, use, and 
-          protect your information when you interact with our chatbot on Facebook Messenger.
+          and handling your personal information responsibly.
         </p>
 
         <h2>2. Information We Collect</h2>
-        <p>When you interact with the SJC Sports Bot, we collect the following information:</p>
         <ul>
-          <li><strong>Facebook User ID:</strong> A unique identifier provided by Facebook to enable us to respond to your messages</li>
+          <li><strong>Facebook User ID:</strong> A unique identifier provided by Facebook</li>
           <li><strong>Message Content:</strong> The text messages you send to our bot</li>
-          <li><strong>Language Preference:</strong> Automatically detected based on your message to provide responses in your language</li>
-          <li><strong>Interaction Timestamps:</strong> When you send messages (for session management only)</li>
+          <li><strong>Language Preference:</strong> Automatically detected (supports 15 languages)</li>
+          <li><strong>Interaction Timestamps:</strong> For session management only</li>
         </ul>
-        <p><span class="highlight">Note:</span> We do NOT collect your name, email address, phone number, or any other personal information beyond what Facebook Messenger provides for bot interactions.</p>
 
         <h2>3. How We Use Your Information</h2>
-        <p>Your information is used exclusively for the following purposes:</p>
         <ul>
-          <li>To respond to your inquiries about SJC sports programs, scholarships, and events</li>
-          <li>To provide information about team tryouts, training schedules, and merchandise</li>
-          <li>To detect your language and respond in your preferred language</li>
-          <li>To improve our chatbot's responses and user experience</li>
-          <li>To maintain conversation context during your current session</li>
+          <li>To respond to inquiries about SJC sports programs and scholarships</li>
+          <li>To detect your language and respond appropriately</li>
+          <li>To improve our chatbot's responses</li>
         </ul>
 
-        <h2>4. Data Storage and Retention</h2>
+        <h2>4. Data Storage</h2>
         <p>
           <strong>We do not permanently store your personal messages.</strong> Messages are processed in real-time 
-          through our AI system (Google Gemini) and are not retained in our database. Conversation data may be 
-          temporarily cached during your active session but is automatically deleted after the session ends.
-        </p>
-        <p>
-          Server logs containing anonymized interaction data (such as timestamps and response times) may be 
-          retained for up to 30 days for technical monitoring purposes only.
+          and are not retained in our database.
         </p>
 
-        <h2>5. Third-Party Services</h2>
-        <p>Our chatbot uses the following third-party services:</p>
-        <ul>
-          <li>
-            <strong>Facebook Messenger Platform:</strong> For message delivery and receiving messages. 
-            Facebook's privacy policy applies: <a href="https://www.facebook.com/privacy/explanation" target="_blank">facebook.com/privacy</a>
-          </li>
-          <li>
-            <strong>Google Gemini AI:</strong> For generating intelligent responses to your questions. 
-            Your messages are processed by Google's AI but are not used to train their models or stored permanently. 
-            Google's privacy policy: <a href="https://policies.google.com/privacy" target="_blank">policies.google.com/privacy</a>
-          </li>
-          <li>
-            <strong>Render.com:</strong> Cloud hosting service for our bot infrastructure. 
-            Privacy policy: <a href="https://render.com/privacy" target="_blank">render.com/privacy</a>
-          </li>
-        </ul>
-
-        <h2>6. Data Sharing and Disclosure</h2>
-        <p>
-          <strong>We do NOT sell, trade, rent, or share your personal information with third parties</strong> for 
-          marketing purposes. Your information may only be disclosed in the following limited circumstances:
-        </p>
-        <ul>
-          <li><strong>With Your Consent:</strong> If you explicitly request us to share information</li>
-          <li><strong>Legal Requirements:</strong> If required by law, court order, or government regulation</li>
-          <li><strong>Service Providers:</strong> Only to the extent necessary for the third-party services mentioned above to function</li>
-        </ul>
-
-        <h2>7. Your Rights and Choices</h2>
-        <p>You have the following rights regarding your data:</p>
-        <ul>
-          <li><strong>Stop Using the Service:</strong> You can stop using the bot at any time by not sending messages</li>
-          <li><strong>Delete Conversation:</strong> You can delete your conversation history on Facebook Messenger</li>
-          <li><strong>Request Data Deletion:</strong> Contact us to request deletion of any stored data</li>
-          <li><strong>Access Your Information:</strong> Request information about what data we have about you</li>
-          <li><strong>Opt-Out:</strong> Block or report the bot on Facebook Messenger to stop all interactions</li>
-        </ul>
-
-        <h2>8. Children's Privacy</h2>
-        <p>
-          Our service is intended for users <strong>13 years of age and older</strong>, in compliance with Facebook's 
-          Terms of Service and the Children's Online Privacy Protection Act (COPPA). We do not knowingly collect 
-          information from children under 13. If we become aware that we have collected data from a child under 13, 
-          we will take immediate steps to delete that information.
-        </p>
-
-        <h2>9. Data Security</h2>
-        <p>
-          We implement reasonable security measures to protect your information from unauthorized access, alteration, 
-          disclosure, or destruction. These include:
-        </p>
-        <ul>
-          <li>Secure HTTPS/SSL encryption for all data transmission</li>
-          <li>Access controls and authentication for our systems</li>
-          <li>Regular security monitoring and updates</li>
-          <li>Minimal data retention policies</li>
-        </ul>
-        <p>
-          However, no method of transmission over the internet is 100% secure. While we strive to protect your 
-          information, we cannot guarantee absolute security.
-        </p>
-
-        <h2>10. International Users</h2>
-        <p>
-          Our service is primarily intended for users in the Philippines. However, we support multiple languages 
-          and welcome international users. By using our service, you consent to the transfer and processing of 
-          your information in the Philippines and the United States (where our hosting and AI services are located).
-        </p>
-
-        <h2>11. Changes to This Privacy Policy</h2>
-        <p>
-          We may update this Privacy Policy from time to time to reflect changes in our practices or for legal, 
-          operational, or regulatory reasons. When we make changes, we will:
-        </p>
-        <ul>
-          <li>Update the "Effective Date" at the top of this policy</li>
-          <li>Post the updated policy at this URL</li>
-          <li>Notify users through the chatbot if changes are significant</li>
-        </ul>
-        <p>We encourage you to review this policy periodically.</p>
-
-        <h2>12. Contact Us</h2>
+        <h2>5. Contact Us</h2>
         <div class="contact-box">
-          <p><strong>For questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact:</strong></p>
-          <p style="margin-top: 15px;">
-            <strong>Saint Joseph College - Sports Development Office</strong><br>
-            📧 Email: <a href="mailto:sjcdo@gmail.com">sjcdo@gmail.com</a><br>
-            📍 Location: Tungka-tunga, Maasin City, Southern Leyte, Philippines<br>
-            💬 Facebook: <a href="https://www.facebook.com/people/SJC-Sports-Chat/61582368223061/" target="_blank">SJC Sports Chat</a>
-          </p>
-          <p style="margin-top: 15px;">
-            <strong>Response Time:</strong> We will respond to privacy-related inquiries within 5-7 business days.
-          </p>
+          <p><strong>Saint Joseph College - Sports Development Office</strong><br>
+          📧 Email: <a href="mailto:sjcdo@gmail.com">sjcdo@gmail.com</a><br>
+          📍 Location: Tungka-tunga, Maasin City, Southern Leyte, Philippines</p>
         </div>
-
-        <h2>13. Consent</h2>
-        <p>
-          By using the SJC Sports Bot on Facebook Messenger, you acknowledge that you have read, understood, and 
-          agree to the terms of this Privacy Policy. If you do not agree with this policy, please do not use our service.
-        </p>
 
         <div class="footer">
           <p><strong>© 2025 Saint Joseph College - Sports Development Office</strong></p>
-          <p>All rights reserved.</p>
-          <p style="margin-top: 10px;">
-            🏀 Go GreenHawks! 🦅
-          </p>
+          <p>🏀 Go GreenHawks! 🦅</p>
         </div>
       </div>
     </body>
@@ -712,7 +863,7 @@ app.get('/privacy', (req, res) => {
   `);
 });
 
-// Terms of Service route (optional but recommended)
+// Terms of Service route
 app.get('/terms', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -746,11 +897,6 @@ app.get('/terms', (req, res) => {
           border-bottom: 3px solid #2a5298;
           padding-bottom: 15px;
         }
-        .effective-date {
-          color: #666;
-          font-size: 0.9em;
-          margin-bottom: 30px;
-        }
         h2 {
           color: #2a5298;
           font-size: 1.5em;
@@ -775,79 +921,41 @@ app.get('/terms', (req, res) => {
           color: #666;
           font-size: 0.9em;
         }
-        .highlight {
-          background: #fff3cd;
-          padding: 2px 6px;
-          border-radius: 3px;
-        }
       </style>
     </head>
     <body>
       <div class="container">
         <h1>🏀 Terms of Service</h1>
-        <p class="effective-date"><strong>Effective Date:</strong> October 23, 2025</p>
-        <p class="effective-date"><strong>Service:</strong> SJC GreenHawks Sports Chatbot on Facebook Messenger</p>
+        <p><strong>Effective Date:</strong> October 31, 2025</p>
 
         <h2>1. Acceptance of Terms</h2>
         <p>
-          By accessing and using the SJC GreenHawks Sports Chatbot ("the Service"), you agree to be bound by these 
-          Terms of Service and our Privacy Policy. If you do not agree with any part of these terms, you must not use our Service.
+          By using the SJC GreenHawks Sports Chatbot, you agree to these Terms of Service.
         </p>
 
         <h2>2. Description of Service</h2>
         <p>
-          The SJC Sports Bot is an AI-powered chatbot that provides information about Saint Joseph College's 
-          sports programs, including:
-        </p>
-        <ul>
-          <li>Information about sports teams and varsity scholarships</li>
-          <li>Tryout schedules and requirements</li>
-          <li>Training programs and schedules</li>
-          <li>Merchandise information</li>
-          <li>General inquiries about SJC sports</li>
-        </ul>
-        <p>
-          The Service is provided "as is" and we reserve the right to modify or discontinue the Service at any time.
+          The SJC Sports Bot is an AI-powered multilingual chatbot (15 languages) that provides information about 
+          Saint Joseph College's sports programs.
         </p>
 
         <h2>3. User Conduct</h2>
-        <p>You agree not to:</p>
         <ul>
-          <li>Use the Service for any illegal or unauthorized purpose</li>
-          <li>Send spam, abusive, harassing, or inappropriate content</li>
-          <li>Attempt to hack, disrupt, or overload the Service</li>
-          <li>Impersonate any person or entity</li>
-          <li>Use automated systems to interact with the bot</li>
+          <li>Use the Service only for lawful purposes</li>
+          <li>Do not send spam or abusive content</li>
+          <li>Do not attempt to disrupt the Service</li>
         </ul>
 
-        <h2>4. Intellectual Property</h2>
+        <h2>4. Contact</h2>
         <p>
-          All content provided through the Service, including but not limited to text, graphics, logos, and 
-          the SJC GreenHawks name, are the property of Saint Joseph College and are protected by intellectual 
-          property laws.
-        </p>
-
-        <h2>5. Limitation of Liability</h2>
-        <p>
-          The Service is provided for informational purposes only. While we strive for accuracy, we do not 
-          guarantee that all information provided is complete, accurate, or up-to-date. Saint Joseph College 
-          shall not be liable for any damages arising from your use of the Service.
-        </p>
-
-        <h2>6. Contact Information</h2>
-        <p>
-          For questions about these Terms of Service, please contact:<br>
           <strong>SJC Sports Development Office</strong><br>
           📧 Email: sjcdo@gmail.com<br>
-          📍 Location: Tungka-tunga, Maasin City, Southern Leyte, Philippines
+          📍 Tungka-tunga, Maasin City, Southern Leyte, Philippines
         </p>
 
         <div class="footer">
-          <p><strong>© 2025 Saint Joseph College - Sports Development Office</strong></p>
-          <p>All rights reserved.</p>
-          <p style="margin-top: 10px;">
-            🏀 Go GreenHawks! 🦅
-          </p>
+          <p><strong>© 2025 Saint Joseph College</strong></p>
+          <p>🏀 Go GreenHawks! 🦅</p>
         </div>
       </div>
     </body>
@@ -860,12 +968,13 @@ app.listen(PORT, () => {
   console.log('\n' + '='.repeat(60));
   console.log('🏀 SJC GREENHAWKS SPORTS BOT STARTED!');
   console.log('='.repeat(60));
-  console.log(`📍 Server running on port: ${PORT}`);
-  console.log(`🌐 Status page: https://sjc-sports-bot.onrender.com`);
+  console.log(`🌐 Server running on port: ${PORT}`);
+  console.log(`📊 Status page: https://sjc-sports-bot.onrender.com`);
   console.log(`🔗 Webhook URL: https://sjc-sports-bot.onrender.com/webhook`);
   console.log(`🔑 Verify Token: ${VERIFY_TOKEN}`);
+  console.log(`🌍 Supported Languages: 15 (5 World + 10 Philippine)`);
   console.log('='.repeat(60));
   console.log('🚀 Ready to receive webhook events from Facebook!');
-  console.log('💡 Make sure your webhook is subscribed in Facebook Developer');
+  console.log('💡 Multilingual support: Auto-detects user language');
   console.log('='.repeat(60) + '\n');
 });
