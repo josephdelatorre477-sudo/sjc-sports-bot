@@ -37,6 +37,28 @@ SPORTS COORDINATORS:
 SPORTS OFFERED (17 Sports):
 Basketball, Volleyball, Arnis, Futsal, Sepak Takraw, Athletics, Football, Wushu, Table Tennis, Billiards, Taekwondo, Chess, Badminton, Boxing, Swimming, Dance Sports, Tennis
 
+FACILITIES AND TRAINING LOCATIONS:
+
+1. SJC Extension Campus, Mambajao (Poblacion)
+   - Address: 6600 Maasin, Philippines (4VM3+G56, San Jose Street, Maasin, Southern Leyte)
+   - Google Maps: https://maps.app.goo.gl/PHnkZHJ94CFShYPfA
+   - Sports: Basketball, Football, Billiards, Tennis, Athletics
+
+2. SJC Junior High School Department
+   - Address: 4RMQ+724, Maasin, Southern Leyte
+   - Google Maps: https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7
+   - Sports: Table Tennis, Dance Sports, Chess, Arnis, Wushu, Badminton
+   - Also location of: Sports Development Office, SJC Fitness Gym
+
+3. SJC Elementary Department at Bishop Hacbang Gym
+   - Address: 4RJQ+Q64, Rosales Street, Maasin, Southern Leyte
+   - Google Maps: https://maps.app.goo.gl/BSo8cEWfzKWTezX36
+   - Sports: Volleyball, Sepak Takraw, Futsal, Taekwondo
+
+4. SJC Main Campus
+   - Address: 4RJQ+P2R, E. Cabrera Street, Maasin, Southern Leyte
+   - Google Maps: https://maps.app.goo.gl/HBnCK2NdG7GtYNS16
+
 FACILITIES:
 - SJC Fitness Gym (located at SJC Junior High School Department)
 
@@ -58,8 +80,9 @@ INSTRUCTIONS:
 1. ALWAYS respond in the EXACT SAME LANGUAGE the user writes in
 2. Keep responses SHORT (2-4 sentences maximum)
 3. Be enthusiastic with appropriate sports emojis 🏀⚽🏐🦅
-4. For announcements/updates, direct users to Facebook: https://www.facebook.com/profile.php?id=100094320444442
-5. If unsure, suggest visiting the office (beside SJC Clinic) or emailing sjcdo@gmail.com
+4. When asked about specific sports, mention the training location/facility
+5. For announcements/updates, direct users to Facebook: https://www.facebook.com/profile.php?id=100094320444442
+6. If unsure, suggest visiting the office (beside SJC Clinic) or emailing sjcdo@gmail.com
 
 CRITICAL: Match the user's language EXACTLY!`;
 
@@ -331,6 +354,7 @@ app.get('/', (req, res) => {
           <p><strong>Sports Development Office:</strong></p>
           <p>📍 Tunga-Tunga, Maasin City</p>
           <p>🏫 SJC Junior High School Department (Beside SJC Clinic)</p>
+          <p>🗺️ <a href="https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7" target="_blank">View on Google Maps</a></p>
           <p>📧 Email: sjcdo@gmail.com</p>
           <p>📱 Facebook: <a href="https://www.facebook.com/profile.php?id=100094320444442" target="_blank">SJC Sports Page</a></p>
           <p style="margin-top: 15px;"><strong>Sports Coordinators:</strong></p>
@@ -338,6 +362,37 @@ app.get('/', (req, res) => {
           <p>👨‍🏫 Sir Jason S. Monter</p>
           <p style="margin-top: 15px;"><strong>Fitness Facility:</strong></p>
           <p>💪 SJC Fitness Gym (at SJC Junior High School Department)</p>
+        </div>
+
+        <div class="info-box">
+          <h3>🏟️ Training Facilities & Locations</h3>
+          
+          <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <h4 style="color: #ffeb3b; margin-bottom: 8px;">📍 SJC Extension Campus, Mambajao</h4>
+            <p style="font-size: 0.9em; margin: 5px 0;">🏀 Basketball | ⚽ Football | 🎱 Billiards | 🎾 Tennis | 🏃 Athletics</p>
+            <p style="font-size: 0.85em; margin: 5px 0;">📌 San Jose Street, Maasin, Southern Leyte (4VM3+G56)</p>
+            <p style="font-size: 0.85em;"><a href="https://maps.app.goo.gl/PHnkZHJ94CFShYPfA" target="_blank" style="color: #4CAF50;">🗺️ View Map</a></p>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <h4 style="color: #ffeb3b; margin-bottom: 8px;">📍 SJC Junior High School Department</h4>
+            <p style="font-size: 0.9em; margin: 5px 0;">🏓 Table Tennis | 💃 Dance Sports | ♟️ Chess | 🥋 Arnis | 🥋 Wushu | 🏸 Badminton</p>
+            <p style="font-size: 0.85em; margin: 5px 0;">📌 Tunga-Tunga, Maasin, Southern Leyte (4RMQ+724)</p>
+            <p style="font-size: 0.85em;"><a href="https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7" target="_blank" style="color: #4CAF50;">🗺️ View Map</a></p>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <h4 style="color: #ffeb3b; margin-bottom: 8px;">📍 SJC Elementary Dept - Bishop Hacbang Gym</h4>
+            <p style="font-size: 0.9em; margin: 5px 0;">🏐 Volleyball | 🏸 Sepak Takraw | ⚽ Futsal | 🥋 Taekwondo</p>
+            <p style="font-size: 0.85em; margin: 5px 0;">📌 Rosales Street, Maasin, Southern Leyte (4RJQ+Q64)</p>
+            <p style="font-size: 0.85em;"><a href="https://maps.app.goo.gl/BSo8cEWfzKWTezX36" target="_blank" style="color: #4CAF50;">🗺️ View Map</a></p>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <h4 style="color: #ffeb3b; margin-bottom: 8px;">📍 SJC Main Campus</h4>
+            <p style="font-size: 0.85em; margin: 5px 0;">📌 E. Cabrera Street, Maasin, Southern Leyte (4RJQ+P2R)</p>
+            <p style="font-size: 0.85em;"><a href="https://maps.app.goo.gl/HBnCK2NdG7GtYNS16" target="_blank" style="color: #4CAF50;">🗺️ View Map</a></p>
+          </div>
         </div>
 
         <div class="info-box">
@@ -527,12 +582,43 @@ function getFallbackResponse(language, queryLower) {
   }
 
   // Location/Office inquiries
-  if (queryLower.match(/(where|location|saan|asa|diin|office|opisina|lugar)/)) {
+  if (queryLower.match(/(where|location|saan|asa|diin|office|opisina|lugar|facility|campus)/)) {
     const responses = {
-      'English': "📍 Sports Development Office is at SJC Junior High School Department, Tunga-Tunga, Maasin City - beside SJC Clinic! Visit us or contact Sir Dante Monter or Sir Jason S. Monter! 🏫",
-      'Filipino': "📍 Ang Sports Development Office ay nasa SJC Junior High School Department, Tunga-Tunga, Maasin City - tabi ng SJC Clinic! Bisitahin kami o kontakin sina Sir Dante Monter o Sir Jason S. Monter! 🏫",
-      'Cebuano': "📍 Ang Sports Development Office naa sa SJC Junior High School Department, Tunga-Tunga, Maasin City - tupad sa SJC Clinic! Bisitaha mi o kontaka si Sir Dante Monter o Sir Jason S. Monter! 🏫",
-      'Spanish': "📍 ¡La Oficina de Desarrollo Deportivo está en el Departamento de Secundaria de SJC, Tunga-Tunga, Maasin City - al lado de la Clínica SJC! ¡Visítanos o contacta a Sir Dante Monter o Sir Jason S. Monter! 🏫"
+      'English': "📍 Sports Development Office: SJC Junior High School Department, Tunga-Tunga, Maasin City (beside SJC Clinic). Visit Sir Dante Monter or Sir Jason S. Monter! Map: https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7 🏫",
+      'Filipino': "📍 Sports Development Office: SJC Junior High School Department, Tunga-Tunga, Maasin City (tabi ng SJC Clinic). Bisitahin sina Sir Dante Monter o Sir Jason S. Monter! Map: https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7 🏫",
+      'Cebuano': "📍 Sports Development Office: SJC Junior High School Department, Tunga-Tunga, Maasin City (tupad sa SJC Clinic). Bisitaha si Sir Dante Monter o Sir Jason S. Monter! Map: https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7 🏫",
+      'Spanish': "📍 Oficina de Desarrollo Deportivo: SJC Junior High School Department, Tunga-Tunga, Maasin City (al lado de SJC Clinic). ¡Visita a Sir Dante Monter o Sir Jason S. Monter! Mapa: https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7 🏫"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  // Specific sport location inquiries
+  if (queryLower.match(/(basketball|football|billiards|tennis|athletics)/)) {
+    const responses = {
+      'English': "🏀 Basketball, Football, Billiards, Tennis & Athletics are at SJC Extension Campus, Mambajao. Map: https://maps.app.goo.gl/PHnkZHJ94CFShYPfA Contact coordinators for schedule! 📍",
+      'Filipino': "🏀 Basketball, Football, Billiards, Tennis at Athletics ay sa SJC Extension Campus, Mambajao. Map: https://maps.app.goo.gl/PHnkZHJ94CFShYPfA Kontakin ang coordinators para sa schedule! 📍",
+      'Cebuano': "🏀 Basketball, Football, Billiards, Tennis ug Athletics naa sa SJC Extension Campus, Mambajao. Map: https://maps.app.goo.gl/PHnkZHJ94CFShYPfA Kontaka ang coordinators para sa schedule! 📍",
+      'Spanish': "🏀 Baloncesto, Fútbol, Billar, Tenis y Atletismo están en SJC Extension Campus, Mambajao. Mapa: https://maps.app.goo.gl/PHnkZHJ94CFShYPfA ¡Contacta a los coordinadores para el horario! 📍"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  if (queryLower.match(/(table tennis|dance|chess|arnis|wushu|badminton)/)) {
+    const responses = {
+      'English': "🏓 Table Tennis, Dance Sports, Chess, Arnis, Wushu & Badminton are at SJC Junior High School Department. Map: https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7 Contact coordinators! 📍",
+      'Filipino': "🏓 Table Tennis, Dance Sports, Chess, Arnis, Wushu at Badminton ay sa SJC Junior High School Department. Map: https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7 Kontakin ang coordinators! 📍",
+      'Cebuano': "🏓 Table Tennis, Dance Sports, Chess, Arnis, Wushu ug Badminton naa sa SJC Junior High School Department. Map: https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7 Kontaka ang coordinators! 📍",
+      'Spanish': "🏓 Tenis de Mesa, Baile Deportivo, Ajedrez, Arnis, Wushu y Bádminton están en SJC Junior High School Department. Mapa: https://maps.app.goo.gl/NvzJ4FL9RKoowAcG7 ¡Contacta coordinadores! 📍"
+    };
+    return responses[language] || responses['English'];
+  }
+
+  if (queryLower.match(/(volleyball|sepak takraw|futsal|taekwondo|takraw)/)) {
+    const responses = {
+      'English': "🏐 Volleyball, Sepak Takraw, Futsal & Taekwondo are at SJC Elementary Dept (Bishop Hacbang Gym). Map: https://maps.app.goo.gl/BSo8cEWfzKWTezX36 Contact coordinators! 📍",
+      'Filipino': "🏐 Volleyball, Sepak Takraw, Futsal at Taekwondo ay sa SJC Elementary Dept (Bishop Hacbang Gym). Map: https://maps.app.goo.gl/BSo8cEWfzKWTezX36 Kontakin ang coordinators! 📍",
+      'Cebuano': "🏐 Volleyball, Sepak Takraw, Futsal ug Taekwondo naa sa SJC Elementary Dept (Bishop Hacbang Gym). Map: https://maps.app.goo.gl/BSo8cEWfzKWTezX36 Kontaka ang coordinators! 📍",
+      'Spanish': "🏐 Voleibol, Sepak Takraw, Futsal y Taekwondo están en SJC Elementary Dept (Bishop Hacbang Gym). Mapa: https://maps.app.goo.gl/BSo8cEWfzKWTezX36 ¡Contacta coordinadores! 📍"
     };
     return responses[language] || responses['English'];
   }
